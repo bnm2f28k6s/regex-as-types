@@ -12,6 +12,7 @@ Use the checkpoint at the end of each section before reading its answer. For eac
 | [Set operations](set-operations.html) | Union; intersection; difference; complement; symmetric difference; Cartesian product; power set; combined operations |
 | [Strings and regexes](regex-introduction.html) | Strings and ε; pattern languages; search versus membership; character versus string sets; possible type constraints |
 | [Rust regex building blocks](regex-building-blocks.html) | Literals; escaping; classes and ranges; negated classes; wildcard; concatenation; alternation; grouping; repetition; Unicode classes; class set operations; assertions; flags; greediness; captures; combined example |
+| [Pomsky and regex syntax comparisons](pomsky-comparison.html) | Engines versus syntaxes; tab conventions; quoted literals; alternatives; named fragments; character-set intersection; numeric ranges; tests; proposals |
 
 ## Site checks
 
@@ -23,6 +24,7 @@ For the first preview, check these behaviors:
 - Rust examples have readable highlighting, and table patterns retain their backslashes and vertical bars.
 - Previous concepts and next-page links point to the intended pages.
 - Site search can find a concept such as "symmetric difference."
+- On the comparison page, switching between Pomsky, Rust regex, and our set notation changes every example group together. Check all three choices, formulas inside tabs, and the normal content after each group.
 
 The initializer's [Markdown feature sample](examples.html) remains available for reference but is not part of the lesson navigation or an authority on generator behavior. Use [Docgen 0.3.3's upstream documentation](https://github.com/thecodrr/docgen/tree/0.3.3/docs) when checking features.
 
@@ -33,6 +35,8 @@ Run `just check` and `git diff --check` from the project root to check the produ
 Regex table examples should be checked with Rust `regex` **1.12.2**, default crate features, and the `\A(?:pattern)\z` wrapper. Run the complete Rust snippets separately as written. Greedy/lazy examples intentionally use substring search. Keep any test crate outside the repository; it is a documentation check, not an implementation of the proposed language.
 
 For the set examples, calculate results with the finite universes shown on each page, including empty-set boundary cases. These finite checks illustrate the definitions. They are not proofs about every possible set.
+
+For the Pomsky comparisons, use Pomsky **0.12.0** with `--flavor rust`. Test both the generated patterns and the hand-written Rust equivalents with `regex = "=1.12.2"` and the whole-string wrapper. Also run the complete Pomsky test-block example, recording its actual test engine separately. Set-notation panels are mathematical descriptions, not executable examples of our proposed language.
 
 ## First-pass results
 
@@ -46,6 +50,18 @@ The initial local checks passed:
 
 These were one-off checks for this draft, not a maintained regression suite. They support reviewing the examples and rendering; they cannot establish that the teaching flow works for every reader. The next pass should include reading the checkpoints without their answers.
 
+## Pomsky comparison results
+
+The syntax-comparison pass also passed these one-off checks:
+
+- Five Pomsky expressions compiled with Pomsky 0.12.0 and `--flavor rust`. Both generated patterns and the authored Rust constants passed all 44 table inputs with Rust `regex` 1.12.2 and whole-string matching.
+- Eight Rust tests passed on a locked rerun, including those table checks, the embedded label-test cases, substring-search and character-subtraction checks, and the numeric range for every ASCII decimal spelling from 0 through 999 plus a leading-zero variant of each.
+- The complete Pomsky label file passed `pomsky test --flavor rust --engine rust --path label.pomsky`. The unsupported whole-word intersection example produced the expected compiler diagnostic. The original 42 Rust lesson tests also passed again.
+- A Chromium browser check switched through Pomsky, Rust regex, and our set notation, then back to Pomsky. Each choice synchronized all five groups and left exactly one visible panel in each. The four math panels rendered without parse errors, and live search returned the comparison page without JavaScript page errors.
+- A production HTML audit checked all internal links and fragments, the five groups and their panels, all 12 displayed code blocks against the Markdown, section headings, and checkpoints. `just check` and `git diff --check` passed.
+
+Tests and browser tooling stayed outside the repository. These results verify examples and rendering, not universal equivalence of regex flavors or a completed language design.
+
 ## Questions for the next pass
 
 - Do set foundations and set operations need more worked examples, or do the checkpoints suffice?
@@ -54,7 +70,8 @@ These were one-off checks for this draft, not a maintained regression suite. The
 - Which concepts need diagrams or exercises before moving into type constraints?
 - Should the eventual language use whole-string membership, and what universe of values would its complements use?
 - How should string-set intersection and difference be expressed, given that Rust's class operators only operate on characters?
+- Which Pomsky ideas should we adopt: quoted literals, named fragments, descriptive ranges, or tests beside constraints? Which names and operators should distinguish character sets, string sets, and types?
 
-The last two are open language-design questions, not gaps to silently fill in during this documentation pass.
+The questions about membership, set operations, and Pomsky-inspired notation are open language-design questions, not gaps to silently fill in during this documentation pass.
 
 Return to the [reading path](/#reading-path).

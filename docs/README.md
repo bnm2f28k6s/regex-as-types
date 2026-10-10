@@ -10,13 +10,14 @@ This is a first teaching draft, not a language specification. Each concept has i
 2. [Set operations](set-operations.html): union, intersection, difference, complement, symmetric difference, products, and power sets.
 3. [Strings and regexes](regex-introduction.html): strings as values, sets of strings, and whole-string matching versus search.
 4. [Rust regex building blocks](regex-building-blocks.html): literals, character classes, combinations, repetition, assertions, and flags.
-5. [Review this draft](review.html): a lesson checklist, verification scope, and questions for the next pass.
+5. [Pomsky and regex syntax comparisons](pomsky-comparison.html): tabbed examples in Pomsky, Rust regex, and our set notation, plus syntax ideas to discuss.
+6. [Review this draft](review.html): a lesson checklist, verification scope, and questions for the next pass.
 
 ## Scope of this draft
 
 The set lessons start with small finite sets. The regex lessons use Rust's `regex` crate 1.12.2, with Unicode enabled and other flags at their defaults unless stated. We use UTF-8 strings, not byte regexes. Most examples check the entire string, not whether a matching substring exists.
 
-Rust is our reference format for now. Its [crate documentation](https://docs.rs/regex/1.12.2/regex/) describes the supported syntax and notes that look-around and backreferences are not supported. Comparisons with other engines can come later.
+Rust is our reference format for now. Its [crate documentation](https://docs.rs/regex/1.12.2/regex/) describes the supported syntax and notes that look-around and backreferences are not supported. We also compare Pomsky 0.12.0 targeting Rust. Pomsky is a [regex language and compiler](https://github.com/pomsky-lang/pomsky/blob/v0.12.0/README.md#compatibility-and-portability), not another matching engine. JavaScript, Python, Ruby, and Perl remain candidates for later engine comparisons.
 
 These assumptions organize the lessons. They do not settle the proposed language's value universe, encoding, syntax, or type rules.
 

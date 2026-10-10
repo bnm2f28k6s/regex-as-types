@@ -5,4 +5,5 @@ navigation:
   - path: set-operations.md
   - path: regex-introduction.md
   - path: regex-building-blocks.md
+  - path: pomsky-comparison.md
   - path: review.md

@@ -277,4 +277,4 @@ This checks a textual format. It does not turn a string into a number or define 
 
 Answer: our rule specifies ASCII digits, and `[0-9]` expresses that restriction.
 
-Next: [review this draft](review.html).
+Next: [Pomsky and regex syntax comparisons](pomsky-comparison.html).
