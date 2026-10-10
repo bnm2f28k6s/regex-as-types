@@ -8,7 +8,7 @@ Rust's `regex` crate is our main reference. We will also compare JavaScript, Pyt
 
 ## Read and contribute
 
-The website's pages live in `docs/`. Start with `docs/README.md`; `docs/examples.md` is a generated Markdown feature example, not a language specification.
+The website's pages live in `docs/`. Start with `docs/README.md`. The first draft follows sets, set operations, strings, and Rust regex building blocks, with one concept per section and checkpoints for review. `docs/review.md` records the review scope and open questions; `docs/examples.md` is an initializer sample, not a language specification.
 
 Contributions should explain ideas in plain language, build on earlier lessons, and link to sources for technical claims. Mark new design ideas as proposals rather than settled rules. Agents should read [AGENTS.md](AGENTS.md) before working on the project.
 
@@ -18,7 +18,7 @@ Starting references:
 - [Regular-Expressions.info tutorial](https://www.regular-expressions.info/tutorial.html) and [flavor comparison](https://www.regular-expressions.info/refflavors.html)
 - [Docgen](https://github.com/thecodrr/docgen), the documentation site generator used here
 
-We will compile more sources as the lessons develop, including references for set theory and type systems.
+The set lessons also use Oscar Levin's [Discrete Mathematics: An Open Introduction, section 0.3](https://discrete.openmathbooks.org/dmoi3/sec_intro-sets.html). Type-system sources can be added when those lessons develop.
 
 ## Local development
 
@@ -31,6 +31,8 @@ just check  # production build and Git ignore checks
 ```
 
 Edit Markdown in `docs/` and site settings in `docgen.yaml`. Docgen supports [GitHub-flavored Markdown, static syntax highlighting, and tabs](https://github.com/thecodrr/docgen#features). Use tabs when comparing regex systems, and check the preview to confirm they render correctly.
+
+Use relative `.html` links between site pages and `/` for the home page. The installed 0.3.3 generator leaves relative `.md` links unchanged in production HTML, as its [link-rewriter source](https://github.com/thecodrr/docgen/blob/0.3.3/src/markdown/extensions/link_rewriter.rs) also shows. Check the built output, not just the development server. In regex table cells containing `|`, use inline HTML such as `<code>cat&#124;dog</code>`; this version renders a backslash literally when using a Markdown-escaped pipe inside backticks.
 
 The project-local executable is `bin/docgen`. The entire `bin/` directory, generated `site/`, and `.cache/` are Git-ignored. No global Docgen installation is required. Stop the development server with Ctrl-C when running it in a terminal.
 

@@ -1,2 +1,8 @@
 ---
 title: "Regex as types"
+navigation:
+  - path: sets.md
+  - path: set-operations.md
+  - path: regex-introduction.md
+  - path: regex-building-blocks.md
+  - path: review.md
