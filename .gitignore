@@ -1,0 +1,6 @@
+/bin/
+/site/
+/.cache/
+.DS_Store
+.env
+.env.*
