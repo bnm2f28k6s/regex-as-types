@@ -2,7 +2,7 @@
 default:
     @just --list
 
-# Start the live-reloading preview at http://127.0.0.1:4001.
+# Start the live-reloading preview at http://127.0.0.1:4001/regex-as-types/.
 serve:
     ./bin/docgen serve
 
@@ -10,6 +10,14 @@ serve:
 build:
     ./bin/docgen build --release
 
-# Build and verify that the binary and generated site are Git-ignored.
-check: build
+# Test the offline checker and validate installer shell syntax.
+test:
+    sh -n scripts/install-docgen.sh
+    PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -v
+
+# Test, build, and check rendered output, ignores, and unstaged/staged whitespace.
+check: test build
+    python3 scripts/check-site.py
     git check-ignore bin/docgen site/index.html
+    git diff --check
+    git diff --cached --check

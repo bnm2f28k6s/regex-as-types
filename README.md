@@ -21,12 +21,13 @@ The set lessons also use Oscar Levin's [Discrete Mathematics: An Open Introducti
 
 ## Local development
 
-Run these commands from the project root. You need [just](https://github.com/casey/just) and the project-local Docgen 0.3.3 executable. If `bin/docgen` is missing, follow the reinstall instructions below. If just isn't installed and you have Nix, use `nix shell nixpkgs#just` to enter a temporary shell with it available. Run `just` to list tasks.
+Run these commands from the project root. You need Python 3.9 or newer, [just](https://github.com/casey/just), and the project-local Docgen 0.3.3 executable. If `bin/docgen` is missing, follow the reinstall instructions below. If just isn't installed and you have Nix, use `nix shell nixpkgs#just` to enter a temporary shell with it available. Run `just` to list tasks.
 
 ```sh
-just serve  # http://127.0.0.1:4001, with live reload
+just serve  # http://127.0.0.1:4001/regex-as-types/, with live reload
 just build  # production output in site/
-just check  # production build and Git ignore checks
+just test   # checker regression tests and installer shell syntax
+just check  # tests, production build, rendered-site, ignore, and whitespace checks
 ```
 
 Edit Markdown in `docs/` and site settings in `docgen.yaml`. Docgen supports [GitHub-flavored Markdown, static syntax highlighting, and tabs](https://github.com/thecodrr/docgen#features). Keep the main path language-first. Use comparison tabs in supplemental material when helpful, then check the rendered preview.
@@ -49,4 +50,20 @@ The installer builds the upstream 0.3.3 tag at commit `b2d0cfc77110b524f5e5ab547
 
 The initial binary was built and tested on Apple Silicon macOS. Upstream's precompiled macOS release is Intel-only and cannot run here without Rosetta. The native build links only macOS system libraries; Nix is needed for rebuilding, not serving. Other platforms have not been verified. Upstream produces compiler warnings, but the build succeeds.
 
-Docgen serves the preview and live reload on loopback only. Make documentation updates on a separate branch for pull-request review. Local validation builds are not publication; do not merge, push, or publish without approval. A Git remote is configured, but no hosting or deployment workflow is defined here.
+Docgen serves the preview and live reload on loopback only. Make documentation updates on a separate branch for pull-request review. Local validation builds are not publication; do not merge, push, or publish without approval.
+
+## Checks and GitHub Pages
+
+The [GitHub Actions workflow](.github/workflows/pages.yml) runs on pull requests and pushes to `main`. It checks installer shell syntax, runs the checker's regression tests, builds with Docgen 0.3.3, checks the rendered site, and checks Git ignores and whitespace. GitHub actions are commit-pinned. The Linux release archive has a recorded SHA-256 digest, which detects archive changes but is not an independently signed upstream verification.
+
+The offline [rendered-site checker](scripts/check-site.py) is adapted from the prisoner's dilemma project. It checks authored-page coverage, local page links, HTML/SVG fragments, directly referenced assets, and the configured project prefix. It resolves Docgen's extensionless sidebar URLs to `.html`, matching GitHub Pages; a different host needs the same routing. It also checks Docgen's tab markup and math-rendering error markers. Its regression tests include deliberately broken fixtures and a nonzero CLI exit, so accepting every input cannot pass the suite.
+
+The checker uses Python's standard library and makes no network requests. External links, CSS-internal resources, JavaScript-generated links, interactive tab behavior, accessibility, and the mathematical or regex correctness of lesson examples need separate review. A passing site check is not proof of the lesson content.
+
+For an existing production build, run `python3 scripts/check-site.py`. Isolated checks can use `--site PATH --docs PATH --base-path /PROJECT`; otherwise the prefix comes from `docgen.yaml`. A missing or empty build fails rather than silently skipping checks.
+
+The workflow uploads and deploys `site/` only after a successful build on `main`. Pull requests have read-only permissions and skip both upload and deployment. A passing PR does not merge itself or publish a preview. In GitHub Settings > Pages, select GitHub Actions as the publishing source. The site will be at <https://bnm2f28k6s.github.io/regex-as-types/> after this workflow is merged and a deployment succeeds.
+
+The [`base_path` setting](https://github.com/thecodrr/docgen/blob/0.3.3/docs/configuration.md#base_path) is `/regex-as-types/`. The installed binary requires the trailing slash. Keep authored root links such as `/` free of that prefix; Docgen adds it during rendering. Relative `.html` page links stay relative. The Pages marker in `docs/_include/.nojekyll` is copied to the site using [Docgen's static-asset mechanism](https://github.com/thecodrr/docgen/blob/0.3.3/docs/deployment.md#disable-jekyll-builds).
+
+A project-wide reuse license has not been selected. Public visibility alone does not grant an open-source or open-content license. Docgen retains its separate upstream license; its binary and source are not committed here.
