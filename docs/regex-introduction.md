@@ -4,7 +4,7 @@ We now change the values under discussion from small numbers to strings. Keep th
 
 ## Strings and the empty string
 
-For these lessons, a string is a finite sequence of Unicode scalar values. This is an explicit teaching assumption, not a requirement to implement our language using a particular encoding or library. The final character model and representation remain [open design questions](open-design-questions.html#what-values-do-constraints-describe). Whole-string acceptance, however, is a fixed requirement.
+Our language uses strings as its value model, including numeric values described by constrained string sets. For these lessons, a string is a finite sequence of Unicode scalar values. The scalar-value definition is a teaching assumption, not a requirement to use a particular encoding, library, or storage format. The final character model and representation remain [open design questions](open-design-questions.html#what-values-do-constraints-describe). Whole-string acceptance is fixed.
 
 Unlike a set, a string preserves order and repetition. `"ab"` differs from `"ba"`, and `"aa"` differs from `"a"`. Quotes in our prose mark string values; they are not part of those values.
 
@@ -63,7 +63,7 @@ Answer: no. The choice supplies only one character.
 
 ## Where type constraints enter
 
-A set description restricts allowed values. A constraint whose set is `{"cat"}` accepts only that string. Our first language draft will describe such string sets directly. Whether constraints also describe non-string values, and how inclusion relates to subtyping, remain [open questions](open-design-questions.html#what-values-do-constraints-describe).
+A set description restricts allowed values. A constraint whose set is `{"cat"}` accepts only that string. Our language describes such string sets directly so we can use the notation at the type level. The later [sets-as-types lesson](sets-as-types.html) explains the approved rules: a type expression denotes its allowed-value set, equal denoted sets give equal pattern types, and inclusion defines subtyping. Unknown membership requires an explicit check before constrained use. Detailed expression rules remain [open questions](open-design-questions.html#how-do-type-expressions-support-checking); static or dynamic enforcement and failure reporting are [deferred integration concerns](open-design-questions.html#deferred-implementation-and-host-integration).
 
 **Checkpoint.** Have we defined a programming language by defining `L(p)`?
 

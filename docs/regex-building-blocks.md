@@ -66,7 +66,7 @@ Listing all ten ASCII digits with bars is repetitive. A character range is a sho
 
 A range includes both endpoints and selects exactly one character. <code>[&#96;a&#96;-&#96;c&#96;]</code> describes the same set as <code>&#96;a&#96; &#124; &#96;b&#96; &#124; &#96;c&#96;</code>. A character range does not describe an integer interval or a sequence of several digits.
 
-In the core examples, brackets enclose a range with a single character at each endpoint. To combine ranges, prefer alternatives outside the brackets, such as <code>[&#96;a&#96;-&#96;z&#96;] &#124; [&#96;A&#96;-&#96;Z&#96;]</code>. This does not settle whether optional bracketed shorthand could also list choices or combine ranges. Its rules and broader range semantics remain [open questions](open-design-questions.html#what-notation-expresses-the-operations). These examples use ASCII ordering.
+In the core examples, nonempty brackets enclose a range with a single character at each endpoint; empty brackets `[]` denote the empty set. To combine ranges, prefer alternatives outside the brackets, such as <code>[&#96;a&#96;-&#96;z&#96;] &#124; [&#96;A&#96;-&#96;Z&#96;]</code>. This does not settle whether optional bracketed shorthand could also list choices or combine ranges. Its rules and broader range semantics remain [open questions](open-design-questions.html#what-notation-expresses-the-operations). These examples use ASCII ordering.
 
 | Pattern | Accepted strings | Rejected strings |
 | --- | --- | --- |
@@ -78,9 +78,32 @@ In the core examples, brackets enclose a range with a single character at each e
 
 Answer: no. It chooses exactly one character. To list nonconsecutive choices, the lessons prefer `|`.
 
+## Empty brackets describe the empty set
+
+Our approved spelling for the [empty set](sets.html#the-empty-set) is `[]`:
+
+```text
+L([]) = ∅
+```
+
+This display states the meaning of our notation. Think of `[]` as trying to choose one character from no available characters. No choice can succeed, so it accepts no string at all. It does not accept the empty string. The empty literal <code>&#96;&#96;</code> instead accepts exactly that one value.
+
+| Pattern | Accepted strings | Rejected strings |
+| --- | --- | --- |
+| `[]` | None | `""`, `"a"`, `"[]"` |
+| <code>&#96;&#96;</code> | `""` | `"a"`, `" "` |
+
+By the [union rule](#alternatives-add-members), <code>[] &#124; &#96;cat&#96;</code> accepts exactly `"cat"`: adding no members changes nothing. By the joining rule below, <code>[] &#96;cat&#96;</code> accepts nothing: there is no first string to join to `"cat"`. These are deductions from the accepted-set meanings, not executable tests.
+
+Braces still express repetition counts. We do not assign `{}` an empty-set pattern meaning, nor define a reversed character range as an alternative empty-set spelling. The treatment of reversed endpoints remains an [open question](open-design-questions.html#what-notation-expresses-the-operations). General nonempty bracketed choice shorthand is also still open; approving `[]` does not define it. The literal <code>&#96;[]&#96;</code> is different again: it accepts the two-character string `"[]"`.
+
+**Checkpoint.** Is `[]` another way to write the empty-string literal?
+
+Answer: no. Its accepted set has no members; the empty-string literal's set has one member.
+
 ## Empty string and joining choices
 
-The empty string ε has zero characters. The pattern <code>&#96;&#96;</code>, two adjacent backticks with no content, describes the singleton set `{ε}`. It is not the empty set ∅, which has no members. This draft does not yet give the empty set a pattern spelling.
+The empty string ε has zero characters. The pattern <code>&#96;&#96;</code>, two adjacent backticks with no content, describes the singleton set `{ε}`. It is not the empty set ∅, written `[]` in our pattern language, which has no members.
 
 Concatenation joins one string from each set in order. If A = `{"a", "b"}` and B = `{"0", "1"}`, then AB = `{"a0", "a1", "b0", "b1"}`. This is not a Cartesian product of pairs.
 
@@ -107,7 +130,7 @@ Answer: it leaves A unchanged, because joining the empty string adds no characte
 
 ## Repetition: finite and unbounded counts
 
-A repetition operator, also called a quantifier, applies to the preceding literal, character range, or group. Counts are nonnegative whole numbers; a bounded range includes both endpoints and requires its lower bound to be no greater than its upper bound. Unbounded repetition still produces only finite strings.
+A repetition operator, also called a quantifier, applies to the preceding literal, character range, empty-set pattern `[]`, or group. Counts are nonnegative whole numbers; a bounded range includes both endpoints and requires its lower bound to be no greater than its upper bound. Unbounded repetition still produces only finite strings.
 
 For a set A of strings, `A⁺` joins one or more choices from A. Each copy makes its own choice; it need not repeat the same selected member:
 
@@ -131,6 +154,20 @@ A⁺ = A ∪ AA ∪ AAA ∪ …
 For a set A of strings, A* contains every finite concatenation of members of A, including zero copies. Zero copies produce ε. This is different from the power set, which contains subsets.
 
 The entire backtick-delimited literal is one part. Thus <code>&#96;ab&#96;&#42;</code> and <code>(&#96;a&#96; &#96;b&#96;)&#42;</code> have the same meaning, unlike <code>&#96;a&#96; &#96;b&#96;&#42;</code>. Repeating <code>&#96;&#96;</code> any permitted number of times still produces only `""`; different construction choices do not create distinct values.
+
+The empty set exposes the zero-copy boundary. One or more copies of `[]` cannot supply a string, but zero copies require no choice at all and produce ε. The same repetition rules therefore give:
+
+| Pattern | Accepted strings | Rejected strings |
+| --- | --- | --- |
+| `[]+` | None | `""`, `"a"` |
+| <code>[]&#42;</code> | `""` | `"a"`, `" "` |
+| `[]?` | `""` | `"a"`, `" "` |
+| `[]{0}` | `""` | `"a"` |
+| `[]{1}` | None | `""`, `"a"` |
+| `[]{0,2}` | `""` | `"a"` |
+| `[]{1,2}` | None | `""`, `"a"` |
+
+These are deductions from zero-copy and joining semantics. Adding repetition changes the pattern: <code>[]&#42;</code> is equal in meaning to the empty-string literal, not to `[]`. No engine-specific treatment of empty character classes is assumed.
 
 **Checkpoint.** Does <code>&#96;ab&#96;&#42;</code> accept `"a"`? Does <code>&#96;a&#96; &#96;b&#96;&#42;</code>?
 
@@ -166,7 +203,7 @@ Answer: the rule requires exactly two digits after the hyphen.
 
 We have used singleton sets, joining, union, and finite repetition. Earlier [set operations](set-operations.html) also included intersection, difference, complement, and symmetric difference. Knowing those mathematical operations does not yet give them language syntax.
 
-For instance, intersecting `{"a", "b", "c"}` with `{"b", "c", "d"}` gives `{"b", "c"}` by the [intersection definition](set-operations.html#intersection). Whether to give that operation notation for whole string sets or a restricted one-character case remains an [open design question](open-design-questions.html#what-notation-expresses-the-operations). Neither bracketed choice shorthand nor set operations inside brackets are required by these lessons; their possible designs remain separate questions. Variables and type relationships can wait until the small pattern vocabulary is clear.
+For instance, intersecting `{"a", "b", "c"}` with `{"b", "c", "d"}` gives `{"b", "c"}` by the [intersection definition](set-operations.html#intersection). Whether to give that operation notation for whole string sets or a restricted one-character case remains an [open design question](open-design-questions.html#what-notation-expresses-the-operations). Neither bracketed choice shorthand nor set operations inside brackets are required by these lessons; their possible designs remain separate questions. After cardinality and mappings, [sets as types](sets-as-types.html) connects this vocabulary to type checking. Variables remain deferred.
 
 **Checkpoint.** Have we given every set operation a pattern operator?
 
