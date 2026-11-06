@@ -71,10 +71,10 @@ Answer: `∅`. Nothing in U is outside U.
 Keep values belonging to exactly one of the sets, not both. We denote this operation by `A △ B` and define it using difference and union:
 
 ```math
-A \mathbin{\triangle} B = (A \setminus B) \cup (B \setminus A)
+A \triangle B = (A \setminus B) \cup (B \setminus A)
 ```
 
-Using the [definitions of difference and union](https://discrete.openmathbooks.org/dmoi3/sec_intro-sets.html#subsec_notation), we can derive our result: `{1, 2} ∪ {4} = {1, 2, 4}`. The shared value `3` is excluded. Rust also provides a [symmetric-difference operator for character classes](https://docs.rs/regex/1.12.2/regex/#character-classes); we will return to it after introducing those classes.
+Using the [definitions of difference and union](https://discrete.openmathbooks.org/dmoi3/sec_intro-sets.html#subsec_notation), we can derive our result: `{1, 2} ∪ {4} = {1, 2, 4}`. The shared value `3` is excluded. Whether our language should give this operation its own notation is a later [design question](open-design-questions.html#what-notation-expresses-the-operations).
 
 **Checkpoint.** What is `A △ A`?
 
@@ -105,7 +105,7 @@ The power set of A is the set of all subsets of A, including the empty set and A
 For a small example, choose `E = {1, 2}`.
 
 ```math
-\mathcal{P}(E) = \{\varnothing, \{1\}, \{2\}, \{1,2\}\}
+P(E) = \{∅, \{1\}, \{2\}, \{1,2\}\}
 ```
 
 The elements of this result are sets, not individual numbers. `{1}` is in the power set; `{3}` is not, because it is not a subset of E. A power set is not regex repetition.

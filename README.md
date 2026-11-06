@@ -1,16 +1,14 @@
 # Regex as types
 
-A teaching project exploring regexes as a compact notation for sets, and how those sets could constrain the values allowed by a type.
+A teaching project developing a small pattern language for sets of allowed strings, then exploring how set membership can constrain types. The lessons establish sets and strings before introducing [our proposed notation](docs/pattern-language.md). Whole-string acceptance is a fixed requirement; exact syntax and further language choices remain open for review.
 
-We are developing the documentation for a possible programming language, not building an implementation yet. Its notation and rules are still open questions. The goal is to explain the foundations first, then work toward a design that could be implemented later without tying it to a particular language or runtime.
-
-Rust's `regex` crate is our main reference. We will also compare JavaScript, Python, Ruby, Perl, and other regex systems where they help explain an idea or reveal a difference. [Pomsky](https://pomsky-lang.org/) joins the comparison list as a regex language and compiler, not a matching engine. Its [compatibility guide](https://github.com/pomsky-lang/pomsky/blob/v0.12.0/README.md#compatibility-and-portability) explains target-flavor selection.
+The language is not tied to an existing regex syntax or engine. Pomsky inspires the literal-and-operation approach; Rust `regex` and Pomsky appear in [optional translations](docs/regex-translations.md), not as the primary lesson syntax. Pomsky is a regex-writing language and compiler, not a matching engine; its [compatibility guide](https://github.com/pomsky-lang/pomsky/blob/v0.12.0/README.md#compatibility-and-portability) explains target-flavor selection. This remains a documentation project, without a language implementation or compiler dependencies.
 
 ## Read and contribute
 
-The website's pages live in `docs/`. Start with `docs/README.md`. The first draft follows sets, set operations, strings, Rust regex building blocks, and tabbed Pomsky comparisons, with one concept per section and checkpoints for review. `docs/pomsky-comparison.md` compares Pomsky, Rust regex, and our mathematical set notation without selecting language syntax. `docs/review.md` records the review scope and open questions; `docs/examples.md` is an initializer sample, not a language specification.
+The website's pages live in `docs/`. Start with `docs/README.md`. The teaching path follows set foundations, set operations, strings, our first pattern language, building patterns, then cardinality and mappings. Main examples use our proposed notation; engine translations are supplemental. Variables and named fragments are deferred. `docs/open-design-questions.md` separates fixed direction from unresolved decisions. `docs/review.md` records the review scope and questions; `docs/examples.md` is initializer sample content, not a language specification.
 
-Contributions should explain ideas in plain language, build on earlier lessons, and link to sources for technical claims. Mark new design ideas as proposals rather than settled rules. Agents should read [AGENTS.md](AGENTS.md) before working on the project.
+Contributions should explain ideas in plain language, build on earlier lessons, and link to sources for technical claims. Record unresolved language-design choices on the [open design questions page](docs/open-design-questions.md). Agents should read [AGENTS.md](AGENTS.md) before working on the project.
 
 Starting references:
 
@@ -19,7 +17,7 @@ Starting references:
 - [Regular-Expressions.info tutorial](https://www.regular-expressions.info/tutorial.html) and [flavor comparison](https://www.regular-expressions.info/refflavors.html)
 - [Docgen](https://github.com/thecodrr/docgen), the documentation site generator used here
 
-The set lessons also use Oscar Levin's [Discrete Mathematics: An Open Introduction, section 0.3](https://discrete.openmathbooks.org/dmoi3/sec_intro-sets.html). Type-system sources can be added when those lessons develop.
+The set lessons also use Oscar Levin's [Discrete Mathematics: An Open Introduction, section 0.3](https://discrete.openmathbooks.org/dmoi3/sec_intro-sets.html). The cardinality lesson adds Levin's [section 0.4 on functions](https://discrete.openmathbooks.org/dmoi3/sec_intro-functions.html) and Richard Hammack's [Book of Proof, chapter 14](https://richardhammack.github.io/BookOfProof/Main.pdf#page=281). Type-system sources can be added when those lessons develop.
 
 ## Local development
 
@@ -31,9 +29,9 @@ just build  # production output in site/
 just check  # production build and Git ignore checks
 ```
 
-Edit Markdown in `docs/` and site settings in `docgen.yaml`. Docgen supports [GitHub-flavored Markdown, static syntax highlighting, and tabs](https://github.com/thecodrr/docgen#features). Use tabs when comparing regex systems, and check the preview to confirm they render correctly.
+Edit Markdown in `docs/` and site settings in `docgen.yaml`. Docgen supports [GitHub-flavored Markdown, static syntax highlighting, and tabs](https://github.com/thecodrr/docgen#features). Keep the main path language-first. Use comparison tabs in supplemental material when helpful, then check the rendered preview.
 
-For [tabs in Docgen 0.3.3](https://github.com/thecodrr/docgen/blob/0.3.3/docs/features/tabs.md), use headings such as `# [Pomsky](#/tab/pomsky)` and end each group with a horizontal rule. Reusing tab IDs synchronizes the selection across the page. The comparison page uses plain-text fences for Pomsky because this binary has no Pomsky highlighter; do not label it as another language merely to add color.
+For [tabs in Docgen 0.3.3](https://github.com/thecodrr/docgen/blob/0.3.3/docs/features/tabs.md), use headings such as `# [Pomsky](#/tab/pomsky)` and end each group with a horizontal rule. Reusing tab IDs synchronizes the selection across groups. Use plain-text fences for our proposed syntax and Pomsky because this binary has no dedicated highlighter for either; do not label them as another language merely to add color.
 
 Use relative `.html` links between site pages and `/` for the home page. The installed 0.3.3 generator leaves relative `.md` links unchanged in production HTML, as its [link-rewriter source](https://github.com/thecodrr/docgen/blob/0.3.3/src/markdown/extensions/link_rewriter.rs) also shows. Check the built output, not just the development server. In regex table cells containing `|`, use inline HTML such as `<code>cat&#124;dog</code>`; this version renders a backslash literally when using a Markdown-escaped pipe inside backticks.
 
@@ -51,4 +49,4 @@ The installer builds the upstream 0.3.3 tag at commit `b2d0cfc77110b524f5e5ab547
 
 The initial binary was built and tested on Apple Silicon macOS. Upstream's precompiled macOS release is Intel-only and cannot run here without Rosetta. The native build links only macOS system libraries; Nix is needed for rebuilding, not serving. Other platforms have not been verified. Upstream produces compiler warnings, but the build succeeds.
 
-Docgen serves the preview and live reload on loopback only. This repository is local; no hosting, remote, or publication is configured.
+Docgen serves the preview and live reload on loopback only. Make documentation updates on a separate branch for pull-request review. Local validation builds are not publication; do not merge, push, or publish without approval. A Git remote is configured, but no hosting or deployment workflow is defined here.
