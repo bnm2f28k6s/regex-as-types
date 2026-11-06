@@ -4,7 +4,7 @@ The patterns <code>&#96;a&#96;+</code> and <code>&#96;a&#96;+ &#96;b&#96;+</code
 
 This lesson separates the number of distinct values from the structure of those values. Read [building patterns from sets](regex-building-blocks.html) first. We use our proposed notation, whole-string acceptance, and finite Unicode scalar-value strings as the teaching universe. Infinite sets here allow arbitrarily long finite strings; they do not assume a particular machine's storage limit. No engine syntax is required.
 
-The definitions follow Oscar Levin's [functions lesson](https://discrete.openmathbooks.org/dmoi3/sec_intro-functions.html) and Richard Hammack's [*Book of Proof*, sections 14.1–14.3](https://richardhammack.github.io/BookOfProof/Main.pdf#page=281). The pattern examples, mappings, and counting arguments below are our worked deductions from those definitions and our proposed [set-building rules](regex-building-blocks.html). Mathematical names and functions in this lesson are not variable or function syntax for the language.
+The definitions follow Oscar Levin's [functions lesson](https://discrete.openmathbooks.org/dmoi3/sec_intro-functions.html) and Richard Hammack's [*Book of Proof*, sections 14.1–14.3](https://richardhammack.github.io/BookOfProof/Main.pdf#page=281). The pattern examples, mappings, and counting arguments below are our worked deductions from those definitions and our proposed [set-building rules](regex-building-blocks.html). Mathematical numbers, pairs, names, and functions in this lesson are explanatory tools, not additional language-level value kinds or syntax. Our language's [value model is strings](sets-as-types.html), including constrained numeric strings.
 
 ## Cardinality counts distinct members
 
@@ -170,10 +170,10 @@ The preceding results are mathematics under our stated universe, not typing or c
 
 For example, removing all `b`s defines a function from B to A. It is surjective, since `aⁱb` maps to `aⁱ` for every positive i. It is not injective: `"ab"` and `"abb"` both map to `"a"`. This particular conversion loses the `b` count, despite the sets having equal cardinality.
 
-Likewise, equal cardinality alone does not establish inclusion or make unchanged values interchangeable: `"a"` belongs to A but not B. Whether to provide explicit encodings, conversions, or type relationships is recorded under [cardinality and mappings in the open design questions](open-design-questions.html#how-should-cardinality-and-mappings-affect-the-language).
+Likewise, equal cardinality alone does not establish inclusion or make unchanged values interchangeable: `"a"` belongs to A but not B. The [next lesson](sets-as-types.html#inclusion-defines-subtyping) explains our approved inclusion-based subtyping criterion. Equal denoted sets give equal pattern types; equal cardinality alone does not. Explicit encodings and conversions remain [open design questions](open-design-questions.html#how-should-cardinality-and-mappings-affect-the-language).
 
 **Checkpoint.** Does the existence of a bijection authorize an implicit conversion in the proposed language?
 
 Answer: no. It establishes a mathematical possibility. Which mappings the language supports, and which properties they must preserve, remain design decisions.
 
-Next: [open design questions](open-design-questions.html).
+Next: [sets as types](sets-as-types.html).

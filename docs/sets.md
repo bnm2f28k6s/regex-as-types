@@ -30,7 +30,7 @@ The universe, written `U`, is the set of values under discussion. It is not a cl
 
 For our first examples, choose `U = {1, 2, 3, 4, 5}`. A question about "everything outside A" now has a boundary. If `A = {1, 2, 3}`, the values in this universe outside A are `4` and `5`.
 
-In the next regex lesson, we use strings as the universe. The proposed language's universe is an open question tracked on the [design questions page](open-design-questions.html#what-values-do-constraints-describe).
+In the next regex lesson, we use strings as the universe. Strings are the language-level value model; the final character model remains an open question tracked on the [design questions page](open-design-questions.html#what-values-do-constraints-describe). The numbers in these foundations are mathematical examples, not additional language-level value kinds.
 
 **Checkpoint.** Would adding `6` to U change which values are outside A?
 
@@ -39,6 +39,8 @@ Answer: yes. `6` would also be outside A within the new universe.
 ## The empty set
 
 The empty set, written `∅` or `{}`, contains no elements. This is the textbook's [empty-set definition](https://discrete.openmathbooks.org/dmoi3/sec_intro-sets.html#subsec_notation).
+
+These are mathematical spellings. Our later [pattern language](pattern-language.html#empty-brackets-mean-no-possible-value) uses `[]` for the empty set, keeping curly braces for repetition counts. That choice does not change the mathematics or make `[]` a pattern for the empty string.
 
 Be careful about three different objects:
 

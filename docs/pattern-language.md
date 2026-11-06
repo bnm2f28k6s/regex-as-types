@@ -2,7 +2,7 @@
 
 The [strings lesson](regex-introduction.html) gave us the question: does a complete string belong to the set a pattern describes? We can now choose notation for asking it without learning a particular regex engine first.
 
-This page proposes a small notation for our language. It is a documentation design, not an implemented compiler or a finished programming language. The fixed requirement is **whole-string acceptance**. The particular symbols below are a proposal for review.
+This page proposes a small notation for our language. It is a documentation design, not an implemented compiler or a finished programming language. The fixed requirement is **whole-string acceptance**. The particular symbols below are a proposal for review. We are building toward using these set descriptions as [type-level expressions](sets-as-types.html#a-type-expression-describes-allowed-values); first we need to understand the sets they describe.
 
 ## Start with a literal
 
@@ -32,6 +32,7 @@ Here is the proposed vocabulary. The next lesson explains each operation with ac
 | --- | --- | --- |
 | Literal | <code>&#96;cat&#96;</code> | Exactly the string `"cat"` |
 | Empty string | <code>&#96;&#96;</code> | Exactly the zero-character string |
+| Empty set | `[]` | No accepted strings, including no empty string |
 | Alternatives | <code>&#96;a&#96; &#124; &#96;b&#96;</code> | Either complete string, here one character each |
 | Character range | <code>[&#96;0&#96;-&#96;9&#96;]</code> | One ASCII digit, including both endpoints |
 | Join parts | <code>&#96;cat&#96; &#96;s&#96;</code> | The first part followed by the second |
@@ -43,15 +44,29 @@ Here is the proposed vocabulary. The next lesson explains each operation with ac
 
 Whitespace outside literals separates notation and contributes no input characters. <code>&#96;cat&#96; &#96;s&#96;</code> accepts `"cats"`, not `"cat s"`. A required space is written inside a literal, as in <code>&#96;cat&#96; &#96; &#96; &#96;dog&#96;</code>.
 
-A postfix repetition operator applies to the preceding literal, character range, or parenthesized group. Thus <code>&#96;ab&#96;&#42;</code> repeats the entire string `ab`, while <code>&#96;a&#96; &#96;b&#96;&#42;</code> repeats only `b`. Repetition binds before joining, and joining binds before alternatives. Parentheses can make that order explicit. Grouping does not extract a capture.
+Adjacency is the accepted concatenation spelling for now. If we later add an explicit spelling, `~` is the preferred candidate; it is not an operator in the current notation. Existing examples therefore continue to use adjacency.
+
+A postfix repetition operator applies to the preceding literal, character range, empty-set pattern `[]`, or parenthesized group. Thus <code>&#96;ab&#96;&#42;</code> repeats the entire string `ab`, while <code>&#96;a&#96; &#96;b&#96;&#42;</code> repeats only `b`. Repetition binds before joining, and joining binds before alternatives. Parentheses can make that order explicit. Grouping does not extract a capture.
 
 We borrow familiar notation from Pomsky's [alternatives and grouping](https://pomsky-lang.org/docs/language-tour/alternations/), [character ranges](https://pomsky-lang.org/docs/language-tour/character-sets/#character-ranges), and [repetition](https://pomsky-lang.org/docs/language-tour/repetitions/). The meanings in this draft are defined here and in [building patterns from sets](regex-building-blocks.html), not inherited wholesale from another system.
 
-Use `|` as the preferred explicit choice notation, whether the alternatives are characters, words, or larger patterns. The lessons use square brackets for character ranges, with one character at each endpoint. To combine ranges, prefer <code>[&#96;a&#96;-&#96;z&#96;] &#124; [&#96;A&#96;-&#96;Z&#96;]</code>. This teaching convention does not rule out optional bracketed choice shorthand later; its exact form and semantics remain [open](open-design-questions.html#what-notation-expresses-the-operations). The core examples do not require it. In the core notation, adjacency means joining parts, not choosing between them.
+Use `|` as the preferred explicit choice notation, whether the alternatives are characters, words, or larger patterns. The lessons use square brackets for character ranges, with one character at each endpoint, and `[]` for the empty set. To combine ranges, prefer <code>[&#96;a&#96;-&#96;z&#96;] &#124; [&#96;A&#96;-&#96;Z&#96;]</code>. This teaching convention does not rule out optional bracketed choice shorthand later; its exact form and semantics remain [open](open-design-questions.html#what-notation-expresses-the-operations). The core examples do not require it. In the core notation, adjacency means joining parts, not choosing between them.
 
 **Checkpoint.** Which pattern requires a space: <code>&#96;a&#96; &#96;b&#96;</code> or <code>&#96;a b&#96;</code>?
 
 Answer: <code>&#96;a b&#96;</code>. The other pattern accepts `"ab"`.
+
+## Empty brackets mean no possible value
+
+The approved empty-set spelling is `[]`. Read it as a character choice with no available characters. An ordinary character range chooses one character; an empty choice cannot supply one. Consequently, `[]` accepts no complete string, not even `""`. It denotes ∅, unlike the empty literal <code>&#96;&#96;</code>, which denotes `{""}`.
+
+This is our design rule, not a claim that external regex engines interpret `[]` the same way. It does not settle the still-open syntax for nonempty bracketed choice lists. See [the empty-set building block](regex-building-blocks.html#empty-brackets-describe-the-empty-set) for composition and repetition examples.
+
+Square brackets keep this spelling separate from curly-brace repetition counts such as `{2}` and `{2,3}`. Empty curly braces `{}` have no assigned pattern meaning in this draft; their use for ∅ in mathematical prose is a different notation. We use `[]` directly rather than relying on reversed endpoints to encode an impossible range. The treatment of reversed character ranges remains open.
+
+**Checkpoint.** Does `[]` mean "require zero characters"?
+
+Answer: no. It means "no choice is possible." Requiring exactly the empty string uses <code>&#96;&#96;</code>.
 
 ## Always check the complete input
 
@@ -65,6 +80,8 @@ Every pattern on the main teaching path is fully consuming. The question is whet
 | <code>&#96;cat&#96;</code> | `"cat\n"` | No |
 | <code>&#96;&#96;</code> | `""` | Yes |
 | <code>&#96;&#96;</code> | `"cat"` | No |
+| `[]` | `""` | No |
+| `[]` | `"a"` | No |
 
 In input examples, `\n` denotes a line feed. This is a display convention for values, not a decision about escape syntax in our language. No whitespace is trimmed and no case conversion is implicit. Whether a particular external API defaults to substring search is a separate translation concern.
 
@@ -74,7 +91,7 @@ Answer: no. Whole-string acceptance is already the language rule.
 
 ## Keep the first version small
 
-The first draft describes string sets with literals, alternatives, character ranges, joining, grouping, and repetition. Examples use finite Unicode scalar-value strings as their explicit teaching universe. The final character model and encoding remain [open questions](open-design-questions.html#what-values-do-constraints-describe); the basic examples use ASCII so they do not depend on those choices.
+The first draft describes string sets with literals, the empty-set pattern `[]`, alternatives, character ranges, joining, grouping, and repetition. Strings are the language-level value model, not just an introductory example; numeric types will also describe structured strings. Examples use finite Unicode scalar-value strings as their teaching universe. The final character model and encoding remain [open questions](open-design-questions.html#what-values-do-constraints-describe); the basic examples use ASCII so they do not depend on those choices. Internal storage optimizations do not change the sets a pattern denotes.
 
 Variables, named fragments, captures, search preferences, flags, and engine-specific extensions are outside this first draft. Letters such as A and B in mathematical explanations name sets in the prose; they are not variable syntax in the language. We also leave literal escaping, broader character ranges, and notation for further set operations open rather than importing another system's rules silently.
 

@@ -22,9 +22,11 @@ These Rust patterns are bodies to put inside the whole-string wrapper, not compl
 | <code>&#96;a&#96; &#96;b&#96;&#42;</code> | `'a' 'b'*` | `ab*` |
 | <code>&#96;ab&#96;&#42;</code> | `'ab'*` | `(?:ab)*` |
 
-Our preferred notation uses backtick-delimited literals and `|` for explicit choices; the core lessons use brackets for character ranges. Optional bracketed choice shorthand remains an open design possibility. An external translation may still use a character class: Rust's `[ab]` selects either `a` or `b`, as defined by its [character-class rules](https://docs.rs/regex/1.12.2/regex/#character-classes). That equivalent target spelling does not decide the syntax or semantics of possible shorthand in our language.
+Our preferred notation uses backtick-delimited literals and `|` for explicit choices; the core lessons use brackets for character ranges and `[]` for the empty set. Optional bracketed choice shorthand remains an open design possibility. An external translation may still use a character class: Rust's `[ab]` selects either `a` or `b`, as defined by its [character-class rules](https://docs.rs/regex/1.12.2/regex/#character-classes). That equivalent target spelling does not decide the syntax or semantics of possible shorthand in our language.
 
 The literal <code>&#96;ab&#96;</code> is one part in our proposal, so repeating it repeats the whole text. Copying its contents into Rust as `ab*` would instead repeat only `b`. Similarly, literal operator characters need escaping in Rust regex bodies. See Rust's [repetitions](https://docs.rs/regex/1.12.2/regex/#repetitions), [grouping](https://docs.rs/regex/1.12.2/regex/#grouping-and-flags), and [escape sequences](https://docs.rs/regex/1.12.2/regex/#escape-sequences), alongside Pomsky's [strings](https://pomsky-lang.org/docs/language-tour/strings/), [alternatives](https://pomsky-lang.org/docs/language-tour/alternations/), [character sets](https://pomsky-lang.org/docs/language-tour/character-sets/), and [repetition](https://pomsky-lang.org/docs/language-tour/repetitions/).
+
+Our `[]` spelling is defined by the core language, not by an external engine. This table does not supply its translation; copying the same symbols into another tool is not evidence that it preserves the empty-set meaning.
 
 ## Preserving whole-string acceptance
 

@@ -8,6 +8,7 @@ navigation:
   - path: pattern-language.md
   - path: regex-building-blocks.md
   - path: cardinality-and-mappings.md
+  - path: sets-as-types.md
   - path: open-design-questions.md
   - path: review.md
   - path: regex-translations.md
