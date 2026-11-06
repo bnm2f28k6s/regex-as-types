@@ -44,9 +44,11 @@ Here the allowed set is `{"cat", "dog"}`. Alternatives need not have equal lengt
 | <code>&#96;cat&#96; &#124; &#96;dog&#96;</code> | `"cat"`, `"dog"` | `"catdog"`, `"cow"`, `""` |
 | <code>&#96;a&#96; &#124; &#96;cat&#96;</code> | `"a"`, `"cat"` | `"acat"`, `"c"`, `""` |
 
-```math
-L(p \mid q) = L(p) \cup L(q)
+```text
+L(p | q) = L(p) ∪ L(q)
 ```
+
+Read this as "the strings accepted by p or q are the union of the strings accepted by p and those accepted by q." The bar `|` combines patterns; the union symbol `∪` combines their accepted sets. The spaced display is mathematical notation, not a program to execute.
 
 In the equation, p and q stand for patterns in the explanation. This is not variable syntax. The equation is a deduction: accepting either pattern means membership in the union of their allowed sets. Repeating an alternative does not add a new member, so <code>&#96;a&#96; &#124; &#96;a&#96;</code> still describes just `{"a"}`. Parentheses group alternatives into one part, as in <code>(&#96;a&#96; &#124; &#96;b&#96;)</code>; they do not change its allowed set by themselves.
 
@@ -82,8 +84,8 @@ The empty string ε has zero characters. The pattern <code>&#96;&#96;</code>, tw
 
 Concatenation joins one string from each set in order. If A = `{"a", "b"}` and B = `{"0", "1"}`, then AB = `{"a0", "a1", "b0", "b1"}`. This is not a Cartesian product of pairs.
 
-```math
-AB = \{uv \mid u \in A, v \in B\}
+```text
+AB = {uv | u ∈ A, v ∈ B}
 ```
 
 Writing patterns next to each other joins them: <code>&#96;a&#96; &#96;b&#96;</code> describes `{"ab"}`, while <code>&#96;b&#96; &#96;a&#96;</code> describes `{"ba"}`. With grouped alternatives, <code>(&#96;a&#96; &#124; &#96;b&#96;) (&#96;0&#96; &#124; &#96;1&#96;)</code> describes the four strings in AB above. The separating space is notation, not a required input character.
@@ -107,10 +109,10 @@ Answer: it leaves A unchanged, because joining the empty string adds no characte
 
 A repetition operator, also called a quantifier, applies to the preceding literal, character range, or group. Counts are nonnegative whole numbers; a bounded range includes both endpoints and requires its lower bound to be no greater than its upper bound. Unbounded repetition still produces only finite strings.
 
-For a set A of strings, A+ joins one or more choices from A. Each copy makes its own choice; it need not repeat the same selected member:
+For a set A of strings, `A⁺` joins one or more choices from A. Each copy makes its own choice; it need not repeat the same selected member:
 
-```math
-A^+ = A \cup AA \cup AAA \cup \cdots
+```text
+A⁺ = A ∪ AA ∪ AAA ∪ …
 ```
 
 | Pattern | Count | Accepted strings | Rejected strings |
@@ -146,8 +148,8 @@ Read the parts in order: choose a letter at least once, require the literal hyph
 
 In mathematical discussion, let A be the set of one-character strings from `"a"` through `"z"`, H be `{"-"}`, and D be the set of one-character ASCII digit strings. The language is:
 
-```math
-A^+ H D D
+```text
+A⁺ H D D
 ```
 
 | Accepted strings | Rejected strings |

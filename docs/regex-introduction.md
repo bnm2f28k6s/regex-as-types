@@ -20,8 +20,8 @@ Answer: the sets are equal; the strings are not.
 
 For this draft, choose the universe U to be all finite strings of Unicode scalar values. Define `L(p)` to mean the set of complete strings accepted by pattern p. This asks about membership, not where a match occurs in a larger text.
 
-```math
-L(p) = \{s \in U \mid s \text{ matches } p \text{ as a whole string}\}
+```text
+L(p) = {s ∈ U | s matches p as a whole string}
 ```
 
 This is the [set-builder idea](sets.html#describing-a-set-with-a-rule) applied to strings. A pattern is the description; `L(p)` is the set it describes. The letter p is a placeholder in our mathematical discussion, not variable notation in the proposed language.

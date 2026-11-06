@@ -38,6 +38,8 @@ For [tabs in Docgen 0.3.3](https://github.com/thecodrr/docgen/blob/0.3.3/docs/fe
 
 Use relative `.html` links between site pages and `/` for the home page. The installed 0.3.3 generator leaves relative `.md` links unchanged in production HTML, as its [link-rewriter source](https://github.com/thecodrr/docgen/blob/0.3.3/src/markdown/extensions/link_rewriter.rs) also shows. Check the built output, not just the development server. In regex table cells containing `|`, use inline HTML such as `<code>cat&#124;dog</code>`; this version renders a backslash literally when using a Markdown-escaped pipe inside backticks.
 
+Keep short mathematical equations in `text` fences with explicit spaces and Unicode operators. This makes their spacing independent of native MathML layout. These displays explain sets; they are not executable language examples. In inline HTML code, encode literal backticks as `&#96;` and repetition asterisks as `&#42;` so Markdown cannot consume them as formatting.
+
 The project-local executable is `bin/docgen`. The entire `bin/` directory, generated `site/`, and `.cache/` are Git-ignored. No global Docgen installation is required. Stop the development server with Ctrl-C when running it in a terminal.
 
 ## Reinstall the binary
@@ -58,7 +60,7 @@ Docgen serves the preview and live reload on loopback only. Make documentation u
 
 The [GitHub Actions workflow](.github/workflows/pages.yml) runs on pull requests and pushes to `main`. It checks installer shell syntax, runs the checker's regression tests, builds with Docgen 0.3.3, checks the rendered site, and checks Git ignores and whitespace. GitHub actions are commit-pinned. The Linux release archive has a recorded SHA-256 digest, which detects archive changes but is not an independently signed upstream verification.
 
-The offline [rendered-site checker](scripts/check-site.py) is adapted from the prisoner's dilemma project. It checks authored-page coverage, local page links, HTML/SVG fragments, directly referenced assets, and the configured project prefix. It resolves Docgen's extensionless sidebar URLs to `.html`, matching GitHub Pages; a different host needs the same routing. It also checks Docgen's tab markup and math-rendering error markers. Its regression tests include deliberately broken fixtures and a nonzero CLI exit, so accepting every input cannot pass the suite.
+The offline [rendered-site checker](scripts/check-site.py) is adapted from the prisoner's dilemma project. It checks authored-page coverage, local page links, HTML/SVG fragments, directly referenced assets, and the configured project prefix. It resolves Docgen's extensionless sidebar URLs to `.html`, matching GitHub Pages; a different host needs the same routing. It also checks Docgen's tab markup, math-rendering error markers, and exact decoded text for the project's fenced code and explicit inline HTML code examples. This catches missing spaces, operators, or delimiters and unexpected emphasis inside code. Math and Mermaid fences are excluded from literal-code comparison because they render as non-code content. Its regression tests include deliberately broken fixtures and a nonzero CLI exit, so accepting every input cannot pass the suite.
 
 The checker uses Python's standard library and makes no network requests. External links, CSS-internal resources, JavaScript-generated links, interactive tab behavior, accessibility, and the mathematical or regex correctness of lesson examples need separate review. A passing site check is not proof of the lesson content.
 

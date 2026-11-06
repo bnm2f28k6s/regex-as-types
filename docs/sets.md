@@ -66,8 +66,8 @@ Answer: no, because `4 ∉ B`.
 
 Instead of listing elements, we can state a membership condition. This is [set-builder notation](https://discrete.openmathbooks.org/dmoi3/sec_intro-sets.html#subsec_notation).
 
-```math
-A = \{x \in U \mid x < 4\}
+```text
+A = {x ∈ U | x < 4}
 ```
 
 Read this as "A contains the values x in U such that x is less than 4." With `U = {1, 2, 3, 4, 5}`, it describes `{1, 2, 3}`. The vertical bar means "such that" here. It is mathematical notation, not regex syntax.

@@ -23,7 +23,7 @@ For the first preview, check these behaviors:
 
 - The sidebar follows the reading order rather than sorting pages alphabetically.
 - Every concept appears as a separate heading and can be reached by a heading link.
-- Set formulas are typeset, not shown as raw TeX.
+- Short set equations use spaced Unicode text displays, not raw TeX or a dependence on MathML layout. Verify `|`, `∪`, `∩`, `∖`, `∈`, `∉`, `<`, and the superscript in `A⁺` remain visible and distinct.
 - Proposed notation remains plain text, Rust examples have readable highlighting in the companion, and table patterns retain backtick delimiters, backslashes, and vertical bars. Double-quoted input values must remain distinct from patterns, including the empty value `""` and its two-backtick literal pattern.
 - Previous concepts and next-page links point to the intended pages.
 - Site search can find a concept such as "symmetric difference."
@@ -35,7 +35,7 @@ The initializer's [Markdown feature sample](examples.html) remains available for
 
 ## Verification scope
 
-Run `just check` and `git diff --check` from the project root to check the production build, generated-file ignores, and whitespace. These checks do not establish mathematical correctness or executable regex behavior.
+Run `just check` and `git diff --check` from the project root to check the regression tests, production build, generated-file ignores, rendered examples, and whitespace. These checks do not establish mathematical correctness or executable regex behavior.
 
 Our proposed notation has no executable implementation. Review its examples against the stated set-building rules. Separately check hand-authored translations with Rust `regex` **1.12.2**, default crate features and flags, and the `\A(?:pattern)\z` wrapper. Test the accepted/rejected tables, empty strings, trailing line feeds, literal operator characters, grouping, and repetition of entire literals. Passing translations is not proof of a compiler or execution of our language. Keep any test crate outside the repository.
 
