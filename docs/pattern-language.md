@@ -30,10 +30,10 @@ Here is the proposed vocabulary. The next lesson explains each operation with ac
 | --- | --- | --- |
 | Literal | `"cat"` | Exactly the string `"cat"` |
 | Empty string | `""` | Exactly the zero-character string |
-| One-character choice | `["a" "b"]` | One character, either `a` or `b` |
+| Alternatives | <code>&quot;a&quot; &#124; &quot;b&quot;</code> | Either complete string, here one character each |
 | Character range | `["0"-"9"]` | One ASCII digit, including both endpoints |
 | Join parts | `"cat" "s"` | The first part followed by the second |
-| Alternatives | <code>&quot;cat&quot; &#124; &quot;dog&quot;</code> | Either complete string |
+| Longer alternatives | <code>&quot;cat&quot; &#124; &quot;dog&quot;</code> | The same choice operation, applied to words |
 | Grouping | <code>(&quot;cat&quot; &#124; &quot;dog&quot;) &quot;s&quot;</code> | Join `"s"` to either alternative |
 | Optional | `"a"?` | Zero or one copy of the preceding part |
 | Repetition | `"a"*`, `"a"+` | Zero or more, or one or more copies |
@@ -41,9 +41,11 @@ Here is the proposed vocabulary. The next lesson explains each operation with ac
 
 Whitespace outside literals separates notation and contributes no input characters. `"cat" "s"` accepts `"cats"`, not `"cat s"`. A required space is written inside a literal, as in `"cat" " " "dog"`.
 
-A postfix repetition operator applies to the preceding literal, character choice, or parenthesized group. Thus `"ab"*` repeats the entire string `ab`, while `"a" "b"*` repeats only `b`. Repetition binds before joining, and joining binds before alternatives. Parentheses can make that order explicit. Grouping does not extract a capture.
+A postfix repetition operator applies to the preceding literal, character range, or parenthesized group. Thus `"ab"*` repeats the entire string `ab`, while `"a" "b"*` repeats only `b`. Repetition binds before joining, and joining binds before alternatives. Parentheses can make that order explicit. Grouping does not extract a capture.
 
-We borrow familiar notation from Pomsky's [alternatives and grouping](https://pomsky-lang.org/docs/language-tour/alternations/), [character sets](https://pomsky-lang.org/docs/language-tour/character-sets/), and [repetition](https://pomsky-lang.org/docs/language-tour/repetitions/). The meanings in this draft are defined here and in [building patterns from sets](regex-building-blocks.html), not inherited wholesale from another system. For now, character choices list one-character literals and ranges; compact forms such as `["ab"]` are not proposed.
+We borrow familiar notation from Pomsky's [alternatives and grouping](https://pomsky-lang.org/docs/language-tour/alternations/), [character ranges](https://pomsky-lang.org/docs/language-tour/character-sets/#character-ranges), and [repetition](https://pomsky-lang.org/docs/language-tour/repetitions/). The meanings in this draft are defined here and in [building patterns from sets](regex-building-blocks.html), not inherited wholesale from another system.
+
+In this draft, `|` is the only explicit choice operator, whether the alternatives are characters, words, or larger patterns. Square brackets delimit a single character range, with one character at each endpoint. They do not list choices: write `"a" | "b"`, not a bracketed list. To combine ranges, keep the bar outside them, as in `["a"-"z"] | ["A"-"Z"]`. Adjacency always means joining parts, never choosing between them.
 
 **Checkpoint.** Which pattern requires a space: `"a" "b"` or `"a b"`?
 
@@ -70,7 +72,7 @@ Answer: no. Whole-string acceptance is already the language rule.
 
 ## Keep the first version small
 
-The first draft describes string sets with literals, character choices, joining, alternatives, grouping, and repetition. Examples use finite Unicode scalar-value strings as their explicit teaching universe. The final character model and encoding remain [open questions](open-design-questions.html#what-values-do-constraints-describe); the basic examples use ASCII so they do not depend on those choices.
+The first draft describes string sets with literals, alternatives, character ranges, joining, grouping, and repetition. Examples use finite Unicode scalar-value strings as their explicit teaching universe. The final character model and encoding remain [open questions](open-design-questions.html#what-values-do-constraints-describe); the basic examples use ASCII so they do not depend on those choices.
 
 Variables, named fragments, captures, search preferences, flags, and engine-specific extensions are outside this first draft. Letters such as A and B in mathematical explanations name sets in the prose; they are not variable syntax in the language. We also leave literal escaping, broader character ranges, and notation for further set operations open rather than importing another system's rules silently.
 

@@ -122,7 +122,7 @@ Cardinality ignores length and the internal organization of members. We can reta
 
 For positive n, our patterns give these counts:
 
-| Exact length n | `"a"+` | `"a"+ "b"+` | `["a" "b"]+` |
+| Exact length n | `"a"+` | `"a"+ "b"+` | <code>(&quot;a&quot; &#124; &quot;b&quot;)+</code> |
 | --- | --- | --- | --- |
 | 1 | 1 | 0 | 2 |
 | 2 | 1 | 1 | 4 |
@@ -130,11 +130,11 @@ For positive n, our patterns give these counts:
 | 4 | 1 | 3 | 16 |
 | 5 | 1 | 4 | 32 |
 
-These are deductions from our proposed [character-choice and repetition rules](regex-building-blocks.html#repetition-finite-and-unbounded-counts):
+These are deductions from our proposed [alternatives](regex-building-blocks.html#alternatives-add-members) and [repetition rules](regex-building-blocks.html#repetition-finite-and-unbounded-counts):
 
 - `"a"+` has one string at each positive length.
 - `"a"+ "b"+` has `n − 1` strings of length n: choose the split after one of the first `n − 1` characters.
-- `["a" "b"]+` has `2ⁿ` strings of length n: choose `a` or `b` independently at each position.
+- `("a" | "b")+` has `2ⁿ` strings of length n: choose `a` or `b` independently at each position.
 
 All three languages are countably infinite, but their counts at each length differ. Up to length N, the first has N members and the second has `N(N − 1)/2`. The latter follows by summing the counts `0 + 1 + ... + (N − 1)`. A length bound makes the difference finite and directly comparable.
 

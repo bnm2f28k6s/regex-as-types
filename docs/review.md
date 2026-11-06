@@ -12,7 +12,7 @@ Use the checkpoint at the end of each section before reading its answer. For eac
 | [Set operations](set-operations.html) | Union; intersection; difference; complement; symmetric difference; Cartesian product; power set; combined operations |
 | [Strings and regexes](regex-introduction.html) | Strings and ε; pattern languages; search versus membership; character versus string sets; value constraints |
 | [Our first pattern language](pattern-language.html) | Literal values as singleton patterns; proposed vocabulary; whitespace; grouping and binding; full consumption; deferred variables |
-| [Building patterns from sets](regex-building-blocks.html) | Single choices; empty string; concatenation; alternatives as union; finite and unbounded repetition; a complete label; further set operations |
+| [Building patterns from sets](regex-building-blocks.html) | Literals; alternatives as union; character ranges; empty string; concatenation; finite and unbounded repetition; a complete label; further set operations |
 | [Cardinality and mappings](cardinality-and-mappings.html) | Distinct members; functions and images; injections, surjections, and bijections; countable infinity; diagonal listing; counts by length; concatenation collisions; power-set boundary; language-design implications |
 | [Open design questions](open-design-questions.html) | Fixed direction versus proposals; character model; type relationship; operation scope; notation; cardinality and mappings |
 | [Supplemental translations](regex-translations.html), optional | Our notation first; equivalent external patterns; whole-string adapters; external features not imported into the language |
@@ -51,7 +51,8 @@ For Pomsky translations, use Pomsky **0.12.0** with `--flavor rust`. Test compil
 
 - Do set foundations and set operations need more worked examples, or do the checkpoints suffice?
 - Can a reader explain `"cat"`, `"a+b"`, and whole-string acceptance without knowing regex syntax?
-- Is the proposed character-choice spelling readable, and are symbolic repetition counts clear enough?
+- Is it clear that `|` expresses choices of any length, while square brackets delimit only a character range?
+- Does grouping make repeated or joined alternatives clear, and are symbolic repetition counts readable?
 - Is the difference between `"ab"*` and `"a" "b"*` clear?
 - Can readers complete the main path without opening the supplemental translations?
 - Is the building-pattern sequence comfortable to read, or should sections become separate pages?

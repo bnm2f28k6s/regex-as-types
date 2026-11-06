@@ -7,10 +7,11 @@ This page separates the language's fixed direction from proposed notation and un
 - Teach sets and strings first, then develop our own language rather than teach an existing engine as the language.
 - A pattern tests the complete input from start to end. Substring search is not the constraint model, and authors do not add anchors to opt into full consumption.
 - Begin with literal string values as singleton-set patterns and operations that combine their parts. The [pattern-language page](pattern-language.html) proposes concrete notation for review.
+- In the current notation draft, use `|` for explicit choices of any length. Reserve square brackets for a single character range, not a list of characters or a mixture of ranges and literals. This avoids a second choice syntax and keeps adjacency meaning joining throughout.
 - Keep the first draft small and focused on strings. Variables and named fragments are deferred, not required for these examples.
 - Use existing regex tools only as supplemental translations and checks. No engine, compiler target, or syntax compatibility is required.
 
-These points record the current project direction. The exact symbols proposed for literals, character choices, joining, grouping, alternatives, and repetition are not yet a finalized grammar.
+These points record the current project direction. The notation now distinguishes alternatives from bracket-delimited ranges; it is still not a complete grammar. Literal escaping, broader range semantics, and other unresolved details remain below.
 
 ## What values do constraints describe?
 
@@ -25,12 +26,12 @@ The lessons currently use finite Unicode scalar-value strings. The final charact
 ## What notation expresses the operations?
 
 1. Should we adopt the proposed double-quoted literals? How are quotes, backslashes, and control characters escaped? Are other quote forms useful?
-2. Is the proposed notation for joining, character choices, alternatives, grouping, and repetition clear enough? Should we retain symbolic quantifiers or use words? Full consumption is inherent, not an open anchor choice.
+2. Is the proposed notation for joining, character ranges, alternatives, grouping, and repetition clear enough? Should we retain symbolic quantifiers or use words? Explicit choices use `|`, ranges use square brackets, and full consumption is inherent.
 3. If named fragments are added later, what would they denote: a character set, string set, type, or another construct? They are outside the first draft.
 4. Which operations are available for character sets and for arbitrary string sets?
 5. How are bounded repetition and numeric ranges represented? How do signs, leading zeroes, and digit repertoires affect textual ranges?
 6. Should example strings or executable tests live beside a constraint?
-7. How should we spell the empty set, empty character choices, Unicode properties, and any broader character ranges? None has a proposed spelling in this first draft.
+7. How should we spell the empty set and Unicode properties, and define ranges beyond the ASCII examples? Bracketed choice lists and empty bracket classes are not part of this draft; broader range semantics remain open.
 
 The [first pattern language](pattern-language.html) and [building-pattern lesson](regex-building-blocks.html) use our proposed notation as the primary form. The [translation companion](regex-translations.html) shows external equivalents separately. Similarity to Pomsky does not adopt its full grammar or feature set.
 
