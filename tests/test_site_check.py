@@ -1,6 +1,7 @@
 """Offline checker regression tests using isolated sites, never network requests."""
 
 import importlib.util
+from html import escape
 import os
 from pathlib import Path
 import subprocess
@@ -159,6 +160,49 @@ class SiteCheckTest(unittest.TestCase):
                 self.write(self.site, 'index.html', markup)
                 self.assertTrue(any('math' in error.lower() for error in self.errors()))
         self.write(self.site, 'index.html', '<p>The formulas rendered without parse errors.</p><pre><code>PARSE ERROR <merror>example</merror></code></pre><code>PARSE ERROR</code><script>PARSE ERROR</script><style>PARSE ERROR</style>')
+        self.assertEqual(self.errors(), [])
+
+    def test_fenced_equations_preserve_spaces_symbols_and_superscripts(self):
+        equation = 'L(p | q) = L(p) ∪ L(q)\nA = {x ∈ U | x < 4}\nA⁺ = A ∪ AA'
+        self.write(self.docs, 'README.md', '# Home\n\n```text\n' + equation + '\n```\n')
+        self.write(self.site, 'index.html', '<pre><code>' + escape(equation) + '\n</code></pre>')
+        self.assertEqual(self.errors(), [])
+        for broken in [equation.replace(' | ', '|'), equation.replace('∪', 'u'),
+                       equation.replace('<', ''), equation.replace('⁺', '+')]:
+            with self.subTest(broken=broken):
+                self.write(self.site, 'index.html', '<pre><code>' + escape(broken) + '\n</code></pre>')
+                self.assertTrue(any('authored code' in error for error in self.errors()))
+
+    def test_inline_html_code_preserves_backticks_operators_and_quotes(self):
+        self.write(self.docs, 'README.md', '# Home\n<code>&#96;ab&#96;&#42;</code> and <code>&quot;cat&quot;</code>\n')
+        correct = '<code>`ab`*</code> and <code>&quot;cat&quot;</code>'
+        self.write(self.site, 'index.html', correct)
+        self.assertEqual(self.errors(), [])
+        for broken in [correct.replace('*', ''), correct.replace('`', ''),
+                       correct.replace('&quot;cat&quot;', '“cat”')]:
+            with self.subTest(broken=broken):
+                self.write(self.site, 'index.html', broken)
+                self.assertTrue(any('authored code' in error for error in self.errors()))
+
+    def test_markdown_emphasis_inside_code_fails_even_without_source_binding(self):
+        self.write(self.site, 'index.html', '<code>`ab`<em></code> and <code>(`a` `b`)</em></code>')
+        self.assertTrue(any('formatting inside code' in error for error in self.errors()))
+
+    def test_highlighting_spans_preserve_code_but_dropped_duplicate_fails(self):
+        self.write(self.docs, 'README.md', '# Home\n```rust\nlet x = 1;\n```\n<code>x</code> and <code>x</code>\n')
+        correct = '<pre><code><span>let</span> x = <span>1</span>;\n</code></pre><code>x</code><code>x</code>'
+        self.write(self.site, 'index.html', correct)
+        self.assertEqual(self.errors(), [])
+        self.write(self.site, 'index.html', correct.removesuffix('<code>x</code>'))
+        self.assertTrue(any('authored code' in error for error in self.errors()))
+
+    def test_html_code_in_a_fence_is_not_also_an_inline_example(self):
+        self.write(self.docs, 'README.md', '# Home\n```text\n<code>example</code>\n```\n')
+        self.write(self.site, 'index.html', '<pre><code>&lt;code&gt;example&lt;/code&gt;\n</code></pre>')
+        self.assertEqual(self.errors(), [])
+
+    def test_math_and_diagram_fences_are_not_literal_code_examples(self):
+        self.write(self.docs, 'README.md', '# Home\n```math\nx + y\n```\n```mermaid\ngraph TD; A-->B;\n```\n')
         self.assertEqual(self.errors(), [])
 
     def test_command_returns_nonzero_then_passes_when_fixed(self):

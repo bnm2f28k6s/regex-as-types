@@ -30,7 +30,7 @@ The universe, written `U`, is the set of values under discussion. It is not a cl
 
 For our first examples, choose `U = {1, 2, 3, 4, 5}`. A question about "everything outside A" now has a boundary. If `A = {1, 2, 3}`, the values in this universe outside A are `4` and `5`.
 
-Later we will choose a different universe: strings. That is a lesson assumption, not an approved language design.
+In the next regex lesson, we use strings as the universe. The proposed language's universe is an open question tracked on the [design questions page](open-design-questions.html#what-values-do-constraints-describe).
 
 **Checkpoint.** Would adding `6` to U change which values are outside A?
 
@@ -66,8 +66,8 @@ Answer: no, because `4 ∉ B`.
 
 Instead of listing elements, we can state a membership condition. This is [set-builder notation](https://discrete.openmathbooks.org/dmoi3/sec_intro-sets.html#subsec_notation).
 
-```math
-A = \{x \in U \mid x < 4\}
+```text
+A = {x ∈ U | x < 4}
 ```
 
 Read this as "A contains the values x in U such that x is less than 4." With `U = {1, 2, 3, 4, 5}`, it describes `{1, 2, 3}`. The vertical bar means "such that" here. It is mathematical notation, not regex syntax.

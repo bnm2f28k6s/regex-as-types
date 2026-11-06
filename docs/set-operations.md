@@ -14,8 +14,8 @@ For union through symmetric difference, keep these sets fixed:
 
 The union contains values in A **or** B, including values in both.
 
-```math
-A \cup B = \{x \in U \mid x \in A \text{ or } x \in B\}
+```text
+A ∪ B = {x ∈ U | x ∈ A or x ∈ B}
 ```
 
 Our result is `{1, 2, 3, 4}`. The shared value `3` appears only once. `5` is excluded because it is in neither set. See the [union definition](https://discrete.openmathbooks.org/dmoi3/sec_intro-sets.html#subsec_notation).
@@ -28,8 +28,8 @@ Answer: A. Adding no elements changes nothing.
 
 The intersection contains values in A **and** B.
 
-```math
-A \cap B = \{x \in U \mid x \in A \text{ and } x \in B\}
+```text
+A ∩ B = {x ∈ U | x ∈ A and x ∈ B}
 ```
 
 Our result is `{3}`. `2` is excluded because it is not in B; `4` is excluded because it is not in A. See the [intersection definition](https://discrete.openmathbooks.org/dmoi3/sec_intro-sets.html#subsec_notation).
@@ -42,8 +42,8 @@ Answer: `∅`. No value can belong to the empty set.
 
 The difference keeps values in A that are not in B.
 
-```math
-A \setminus B = \{x \in U \mid x \in A \text{ and } x \notin B\}
+```text
+A ∖ B = {x ∈ U | x ∈ A and x ∉ B}
 ```
 
 Our result is `{1, 2}`. In the other direction, `B ∖ A = {4}`. The order matters. See the [difference definition](https://discrete.openmathbooks.org/dmoi3/sec_intro-sets.html#subsec_notation).
@@ -56,8 +56,8 @@ Answer: `∅`. Every element would be removed.
 
 The complement contains everything in the chosen universe that is not in A. We write it as `U ∖ A` to keep that universe visible.
 
-```math
-U \setminus A = \{x \in U \mid x \notin A\}
+```text
+U ∖ A = {x ∈ U | x ∉ A}
 ```
 
 Our result is `{4, 5}`. If we instead chose `U = {1, 2, 3, 4, 5, 6}`, it would be `{4, 5, 6}`. Complement depends on U. See the [complement definition](https://discrete.openmathbooks.org/dmoi3/sec_intro-sets.html#subsec_notation).
@@ -70,11 +70,11 @@ Answer: `∅`. Nothing in U is outside U.
 
 Keep values belonging to exactly one of the sets, not both. We denote this operation by `A △ B` and define it using difference and union:
 
-```math
-A \triangle B = (A \setminus B) \cup (B \setminus A)
+```text
+A △ B = (A ∖ B) ∪ (B ∖ A)
 ```
 
-Using the [definitions of difference and union](https://discrete.openmathbooks.org/dmoi3/sec_intro-sets.html#subsec_notation), we can derive our result: `{1, 2} ∪ {4} = {1, 2, 4}`. The shared value `3` is excluded. Rust also provides a [symmetric-difference operator for character classes](https://docs.rs/regex/1.12.2/regex/#character-classes); we will return to it after introducing those classes.
+Using the [definitions of difference and union](https://discrete.openmathbooks.org/dmoi3/sec_intro-sets.html#subsec_notation), we can derive our result: `{1, 2} ∪ {4} = {1, 2, 4}`. The shared value `3` is excluded. Whether our language should give this operation its own notation is a later [design question](open-design-questions.html#what-notation-expresses-the-operations).
 
 **Checkpoint.** What is `A △ A`?
 
@@ -86,8 +86,8 @@ A Cartesian product contains ordered pairs. Each pair takes its first element fr
 
 For this example, choose `C = {"a", "b"}` and `D = {"0", "1"}`.
 
-```math
-C \times D = \{(c,d) \mid c \in C \text{ and } d \in D\}
+```text
+C × D = {(c, d) | c ∈ C and d ∈ D}
 ```
 
 The result is `{("a", "0"), ("a", "1"), ("b", "0"), ("b", "1")}`. `("0", "a")` is excluded because its first element is not in C.
@@ -104,8 +104,8 @@ The power set of A is the set of all subsets of A, including the empty set and A
 
 For a small example, choose `E = {1, 2}`.
 
-```math
-P(E) = \{∅, \{1\}, \{2\}, \{1,2\}\}
+```text
+P(E) = {∅, {1}, {2}, {1, 2}}
 ```
 
 The elements of this result are sets, not individual numbers. `{1}` is in the power set; `{3}` is not, because it is not a subset of E. A power set is not regex repetition.

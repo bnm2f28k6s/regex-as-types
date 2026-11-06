@@ -5,6 +5,9 @@ navigation:
   - path: sets.md
   - path: set-operations.md
   - path: regex-introduction.md
+  - path: pattern-language.md
   - path: regex-building-blocks.md
-  - path: pomsky-comparison.md
+  - path: cardinality-and-mappings.md
+  - path: open-design-questions.md
   - path: review.md
+  - path: regex-translations.md

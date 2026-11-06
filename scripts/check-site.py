@@ -2,6 +2,8 @@
 """Check Docgen output offline, not external URLs, CSS URLs, or JavaScript behavior."""
 
 import argparse
+from collections import Counter
+from html import unescape
 from html.parser import HTMLParser
 from pathlib import Path
 import re
@@ -19,14 +21,23 @@ class Page(HTMLParser):
         self.panels = set()
         self.controls = []
         self.math_errors = []
+        self.code_errors = []
+        self.code_examples = []
+        self.code_parts = None
         self.stack = []
         self.visible_text = []
         self.feed(text)
+        if self.code_parts is not None:
+            self.code_errors.append('unclosed code element')
         if re.search(r'\bPARSE\s+ERROR\b', ''.join(self.visible_text)):
             self.math_errors.append('visible generated math PARSE ERROR')
 
     def handle_starttag(self, tag, attrs):
         attrs = {key: value or '' for key, value in attrs}
+        if self.code_parts is not None and tag in {'em', 'strong'}:
+            self.code_errors.append('unexpected Markdown formatting inside code')
+        if tag == 'code':
+            self.code_parts = []
         ignored = tag in {'pre', 'code', 'script', 'style', 'template'} or any(value for _, value in self.stack)
         if tag not in {'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr'}:
             self.stack.append((tag, ignored))
@@ -58,14 +69,38 @@ class Page(HTMLParser):
         del self.stack[depth:]
 
     def handle_endtag(self, tag):
+        if tag == 'code' and self.code_parts is not None:
+            self.code_examples.append(''.join(self.code_parts).rstrip('\n'))
+            self.code_parts = None
         for index in range(len(self.stack) - 1, -1, -1):
             if self.stack[index][0] == tag:
                 del self.stack[index:]
                 break
 
     def handle_data(self, data):
+        if self.code_parts is not None:
+            self.code_parts.append(data)
         if not any(value for _, value in self.stack):
             self.visible_text.append(data)
+
+
+def authored_code_examples(text):
+    """Read this project's fences and explicit inline HTML, not arbitrary Markdown."""
+    examples = []
+    fences = re.compile(r'^(?P<fence>`{3,}|~{3,})(?P<info>[^\n]*)\n'
+                        r'(?P<body>.*?)^(?P=fence)[ \t]*(?:\n|$)', re.MULTILINE | re.DOTALL)
+
+    def remove_fence(match):
+        info = match['info'].strip().split()
+        language = info[0] if info else ''
+        if language not in {'math', 'mermaid'}:
+            examples.append(match['body'].rstrip('\n'))
+        # Do not mistake HTML demonstrated inside a fence for an inline example.
+        return '\n' * match[0].count('\n')
+
+    prose = fences.sub(remove_fence, text)
+    examples.extend(unescape(code) for code in re.findall(r'<code>(.*?)</code>', prose, re.DOTALL))
+    return Counter(examples)
 
 
 def configured_base_path(config=None):
@@ -135,10 +170,16 @@ def check_site(site, base_path='', docs=None):
             output = relative.with_name('index.html') if source.name == 'README.md' else relative.with_suffix('.html')
             if site / output not in pages:
                 errors.append(f'missing built page for {relative.as_posix()}')
+            else:
+                expected = authored_code_examples(source.read_text(encoding='utf-8'))
+                missing = expected - Counter(pages[site / output].code_examples)
+                for example, count in missing.items():
+                    errors.append(f'{output.as_posix()}: {count} authored code example(s) missing or changed: {example[:120]!r}')
     checked = 0
     for source, page in pages.items():
         name = source.relative_to(site).as_posix()
         errors.extend(f'{name}: {error}' for error in page.math_errors)
+        errors.extend(f'{name}: {error}' for error in page.code_errors)
         for tab in page.controls:
             if not tab or tab not in page.panels:
                 errors.append(f'{name}: invalid tab control {tab!r}: matching nonempty tab panel required')
@@ -182,7 +223,7 @@ def main():
     if errors:
         print(f'Failed: {len(errors)} site check errors.')
         return 1
-    print(f'Checked {pages} built HTML pages and {links} local links/assets; fragments and page coverage passed.')
+    print(f'Checked {pages} built HTML pages and {links} local links/assets; fragments, page coverage, and authored code passed.')
     return 0
 
 

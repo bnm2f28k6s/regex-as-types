@@ -1,280 +1,175 @@
-# Rust regex building blocks
+# Building patterns from sets
 
-Read [strings and regexes](regex-introduction.html) first. This page uses Rust's `regex` crate 1.12.2, default features, Unicode enabled, and other flags at their defaults unless a pattern changes them.
+Read [our first pattern language](pattern-language.html) first. This lesson uses that proposed notation throughout. We start with small string sets and add operations that build larger ones. Every pattern accepts or rejects a complete input; no anchors are needed.
 
-In the tables, a pattern is shown without its whole-string wrapper. Test it as `\A(?:pattern)\z`, as explained in the [matching convention](regex-introduction.html#search-versus-whole-string-membership). Every listed accepted and rejected string is a membership example, not a substring search. `""` is the empty string; `"\n"` contains a newline; `"\t"` contains a tab. Quotes are not part of the input.
+The examples are deductions from our proposed rules, not executable language tests. Existing tools appear only in the optional [translation companion](regex-translations.html). Mathematical set names and equations explain the patterns; they are not extra language syntax.
 
-## Literals
+## Literals describe one value
 
-A literal matches itself. The pattern `cat` describes the singleton set `{"cat"}` under whole-string matching. Rust permits [Unicode characters directly in patterns](https://docs.rs/regex/1.12.2/regex/#unicode), so literals are not restricted to ASCII.
-
-| Pattern | Accepted strings | Rejected strings |
-| --- | --- | --- |
-| `cat` | `"cat"` | `"Cat"`, `"cats"`, `""` |
-| `é` | `"é"` | `"e"`, `"éé"`, `""` |
-
-**Checkpoint.** Is literal matching case-sensitive by default?
-
-Answer: yes. We will explicitly enable a flag when we want case-insensitive matching.
-
-## Escaping special characters
-
-Some characters instruct the engine rather than matching themselves. For example, `.` is a wildcard; `\.` matches a literal dot. Rust documents these forms in its [escape sequences](https://docs.rs/regex/1.12.2/regex/#escape-sequences).
+A literal string describes one string. <code>&#96;cat&#96;</code> describes `{"cat"}`, and <code>&#96;a&#96;</code> describes `{"a"}`. Backticks mark pattern literals; double quotes mark example values. The rule is the same whether the literal has one character or several.
 
 | Pattern | Accepted strings | Rejected strings |
 | --- | --- | --- |
-| `\.` | `"."` | `"a"`, `".."`, `""` |
-| `a\+b` | `"a+b"` | `"ab"`, `"aaab"`, `""` |
+| <code>&#96;cat&#96;</code> | `"cat"` | `"Cat"`, `"cats"`, `""` |
+| <code>&#96;a&#96;</code> | `"a"` | `"b"`, `"aa"`, `""` |
+| <code>&#96;a+b&#96;</code> | `"a+b"` | `"ab"`, `"aaab"`, `""` |
+| <code>&#96;${name}&#96;</code> | `"${name}"` | `"name"`, `"cat"`, `""` |
 
-In Rust source, write a regex backslash directly inside a raw string: `r"\."`. That is different from the ordinary Rust string `"\\."`, although both supply the same pattern. See the crate's [literal-dot example](https://docs.rs/regex/1.12.2/regex/#example-find-a-middle-initial).
+Operator characters inside a literal stand for themselves. We do not need regex escapes to write <code>&#96;.&#96;</code> or <code>&#96;a+b&#96;</code>. There is no interpolation in this draft, so `${name}` is literal text too. Escaping backticks, backslashes, and control characters is a separate [open notation question](open-design-questions.html#what-notation-expresses-the-operations).
 
-**Checkpoint.** Does `a\+b` repeat the letter `a`?
+**Checkpoint.** Does <code>&#96;a+b&#96;</code> permit several copies of `a` followed by `b`?
 
-Answer: no. The escaped plus sign is a literal character.
+Answer: no. The plus is literal text inside the backticks.
 
-## Character classes and ranges
+## Alternatives add members
 
-A class chooses one character from a set. `[abc]` chooses `a`, `b`, or `c`; `[a-c]` describes the same choices with a range. `[0-9]` selects one ASCII digit. These are Rust's [character-class rules](https://docs.rs/regex/1.12.2/regex/#character-classes).
+The bar `|` means "or." Either alternative can supply the complete string. This implements the [union operation](set-operations.html#union) from the set lesson:
 
-| Pattern | Accepted strings | Rejected strings |
-| --- | --- | --- |
-| `[abc]` | `"a"`, `"b"`, `"c"` | `"ab"`, `"d"`, `""` |
-| `[a-c]` | `"a"`, `"b"`, `"c"` | `"A"`, `"d"`, `""` |
-| `[0-9]` | `"0"`, `"9"` | `"10"`, `"٣"`, `""` |
-
-**Checkpoint.** How many characters does one `[0-9]` consume?
-
-Answer: exactly one. It is not an entire multi-digit number.
-
-## Negated character classes
-
-`[^ab]` selects one character other than `a` or `b`. This is complement at the **character** level, as defined in Rust's [class syntax](https://docs.rs/regex/1.12.2/regex/#character-classes).
-
-| Pattern | Accepted strings | Rejected strings |
-| --- | --- | --- |
-| `[^ab]` | `"c"`, `"é"`, `"\n"` | `"a"`, `"b"`, `"cc"`, `""` |
-
-It is not the complement of the string set `{"a", "b"}` in our universe of all strings. That string-set complement also contains `""` and `"cc"`, but this one-character pattern rejects both. This distinction follows from the class rule and our [chosen universe](regex-introduction.html#a-pattern-as-a-description-of-a-set).
-
-**Checkpoint.** Does negation make a class accept strings of any length?
-
-Answer: no. It changes which character is allowed, not how many are consumed.
-
-## The wildcard
-
-By default, `.` matches one Unicode scalar value other than newline (`\n`). It does not mean "any string." See Rust's [one-character syntax](https://docs.rs/regex/1.12.2/regex/#matching-one-character) and [Unicode model](https://docs.rs/regex/1.12.2/regex/#unicode).
-
-| Pattern | Accepted strings | Rejected strings |
-| --- | --- | --- |
-| `.` | `"a"`, `"é"`, `"🙂"` | `""`, `"ab"`, `"\n"` |
-
-**Checkpoint.** Will a multi-byte UTF-8 character such as `é` require several dots?
-
-Answer: no. In our Unicode-enabled string regex, one dot can match the scalar value `é`.
-
-## Concatenation
-
-Writing patterns next to each other joins their matched strings in order. Rust calls this [concatenation](https://docs.rs/regex/1.12.2/regex/#composites).
-
-| Pattern | Accepted strings | Rejected strings |
-| --- | --- | --- |
-| `ab` | `"ab"` | `"a"`, `"ba"`, `""` |
-| `[ab][01]` | `"a0"`, `"a1"`, `"b0"`, `"b1"` | `"0a"`, `"a"`, `"a00"`, `""` |
-
-For sets of strings A and B, we define their concatenation as the set of strings obtained by joining one string from A to one from B. This is our set interpretation of the engine rule:
-
-```math
-AB = \{uv \mid u \in A \text{ and } v \in B\}
+```text
+`a` | `b` | `c`
 ```
 
-Here `uv` means joined strings, not multiplication. The second example uses `A = {"a", "b"}` and `B = {"0", "1"}`. Compare it with the [Cartesian product](set-operations.html#cartesian-product): concatenation produces `"a0"`, not `("a", "0")`.
+The allowed set is `{"a", "b", "c"}`. This is the preferred way to list character choices in the lessons. Optional bracketed choice shorthand remains an open design possibility, not a prerequisite or a prohibited feature. The same bar operator works for longer strings:
 
-**Checkpoint.** Do `ab` and `ba` describe the same set?
+```text
+`cat` | `dog`
+```
 
-Answer: no. String order matters.
-
-## Alternation
-
-The vertical bar chooses between patterns. `cat|dog` accepts either complete word. Rust defines this in its [composite syntax](https://docs.rs/regex/1.12.2/regex/#composites).
+Here the allowed set is `{"cat", "dog"}`. Alternatives need not have equal lengths. For example, <code>&#96;a&#96; &#124; &#96;cat&#96;</code> accepts either of those two strings. The length of each accepted value comes from its alternative, not from the bar itself.
 
 | Pattern | Accepted strings | Rejected strings |
 | --- | --- | --- |
-| <code>cat&#124;dog</code> | `"cat"`, `"dog"` | `"catdog"`, `"cow"`, `""` |
-| <code>ab&#124;cd</code> | `"ab"`, `"cd"` | `"abd"`, `"acd"`, `""` |
+| <code>&#96;a&#96; &#124; &#96;b&#96;</code> | `"a"`, `"b"` | `"ab"`, `"c"`, `""` |
+| <code>&#96;a&#96; &#124; &#96;b&#96; &#124; &#96;c&#96;</code> | `"a"`, `"b"`, `"c"` | `"ab"`, `"d"`, `""` |
+| <code>&#96;cat&#96; &#124; &#96;dog&#96;</code> | `"cat"`, `"dog"` | `"catdog"`, `"cow"`, `""` |
+| <code>&#96;a&#96; &#124; &#96;cat&#96;</code> | `"a"`, `"cat"` | `"acat"`, `"c"`, `""` |
 
-Under our whole-string membership convention, alternation corresponds to union: a string is accepted if it belongs to either alternative's set. This is a deduction from Rust's alternation rule and the [union definition](set-operations.html#union).
+```text
+L(p | q) = L(p) ∪ L(q)
+```
 
-Alternation has lower precedence than concatenation: `ab|cd` means either `ab` or `cd`, not `a` followed by either `b` or `c`, followed by `d`. See the [alternation tutorial](https://www.regular-expressions.info/alternation.html); grouping makes that distinction explicit in the next section.
+Read this as "the strings accepted by p or q are the union of the strings accepted by p and those accepted by q." The bar `|` combines patterns; the union symbol `∪` combines their accepted sets. The spaced display is mathematical notation, not a program to execute.
 
-**Checkpoint.** Is `cat|dog` the same as `[catdog]`?
+In the equation, p and q stand for patterns in the explanation. This is not variable syntax. The equation is a deduction: accepting either pattern means membership in the union of their allowed sets. Repeating an alternative does not add a new member, so <code>&#96;a&#96; &#124; &#96;a&#96;</code> still describes just `{"a"}`. Parentheses group alternatives into one part, as in <code>(&#96;a&#96; &#124; &#96;b&#96;)</code>; they do not change its allowed set by themselves.
 
-Answer: no. Alternation chooses a word; that class chooses one of the listed characters.
+**Checkpoint.** Does <code>&#96;a&#96; &#124; &#96;b&#96;</code> accept the complete string `"ab"`?
 
-## Grouping
+Answer: no. It accepts one alternative, not both joined together.
 
-`(?:...)` groups a pattern without recording a capture. Parentheses let us choose which part an operation acts on. See Rust's [grouping syntax](https://docs.rs/regex/1.12.2/regex/#grouping-and-flags).
+## Character ranges abbreviate consecutive choices
+
+Listing all ten ASCII digits with bars is repetitive. A character range is a shorter way to describe consecutive one-character choices:
+
+```text
+[`0`-`9`]
+```
+
+A range includes both endpoints and selects exactly one character. <code>[&#96;a&#96;-&#96;c&#96;]</code> describes the same set as <code>&#96;a&#96; &#124; &#96;b&#96; &#124; &#96;c&#96;</code>. A character range does not describe an integer interval or a sequence of several digits.
+
+In the core examples, brackets enclose a range with a single character at each endpoint. To combine ranges, prefer alternatives outside the brackets, such as <code>[&#96;a&#96;-&#96;z&#96;] &#124; [&#96;A&#96;-&#96;Z&#96;]</code>. This does not settle whether optional bracketed shorthand could also list choices or combine ranges. Its rules and broader range semantics remain [open questions](open-design-questions.html#what-notation-expresses-the-operations). These examples use ASCII ordering.
 
 | Pattern | Accepted strings | Rejected strings |
 | --- | --- | --- |
-| <code>a(?:b&#124;c)d</code> | `"abd"`, `"acd"` | `"ab"`, `"cd"`, `"ad"`, `""` |
+| <code>[&#96;a&#96;-&#96;c&#96;]</code> | `"a"`, `"b"`, `"c"` | `"A"`, `"d"`, `""` |
+| <code>[&#96;0&#96;-&#96;9&#96;]</code> | `"0"`, `"9"` | `"10"`, `"٣"`, `""` |
+| <code>[&#96;a&#96;-&#96;z&#96;] &#124; [&#96;A&#96;-&#96;Z&#96;]</code> | `"a"`, `"z"`, `"A"`, `"Z"` | `"aA"`, `"0"`, `""` |
 
-**Checkpoint.** Does a non-capturing group add literal parentheses to the accepted string?
+**Checkpoint.** Does <code>[&#96;0&#96;-&#96;9&#96;]</code> accept the two-character string `"10"`?
 
-Answer: no. It organizes the pattern.
+Answer: no. It chooses exactly one character. To list nonconsecutive choices, the lessons prefer `|`.
 
-## Repetition
+## Empty string and joining choices
 
-A quantifier sets how many times the preceding item or group may match. Rust's [repetition syntax](https://docs.rs/regex/1.12.2/regex/#repetitions) defines these counts:
+The empty string ε has zero characters. The pattern <code>&#96;&#96;</code>, two adjacent backticks with no content, describes the singleton set `{ε}`. It is not the empty set ∅, which has no members. This draft does not yet give the empty set a pattern spelling.
 
-| Pattern | Count of the preceding item | Accepted strings | Rejected strings |
+Concatenation joins one string from each set in order. If A = `{"a", "b"}` and B = `{"0", "1"}`, then AB = `{"a0", "a1", "b0", "b1"}`. This is not a Cartesian product of pairs.
+
+```text
+AB = {uv | u ∈ A, v ∈ B}
+```
+
+Writing patterns next to each other joins them: <code>&#96;a&#96; &#96;b&#96;</code> describes `{"ab"}`, while <code>&#96;b&#96; &#96;a&#96;</code> describes `{"ba"}`. With grouped alternatives, <code>(&#96;a&#96; &#124; &#96;b&#96;) (&#96;0&#96; &#124; &#96;1&#96;)</code> describes the four strings in AB above. The separating space is notation, not a required input character.
+
+Parentheses make each choice one part. For example, <code>&#96;a&#96; (&#96;b&#96; &#124; &#96;c&#96;) &#96;d&#96;</code> joins `a`, either `b` or `c`, then `d`. Joining binds before alternatives, so <code>&#96;a&#96; &#124; &#96;b&#96; &#96;c&#96;</code> means either `"a"` or `"bc"`. Write <code>(&#96;a&#96; &#124; &#96;b&#96;) &#96;c&#96;</code> to require the final `c` after either choice.
+
+| Pattern | Accepted strings | Rejected strings |
+| --- | --- | --- |
+| <code>&#96;&#96;</code> | `""` | `"a"`, `" "` |
+| <code>&#96;a&#96; &#96;b&#96;</code> | `"ab"` | `"a b"`, `"ba"`, `""` |
+| <code>(&#96;a&#96; &#124; &#96;b&#96;) (&#96;0&#96; &#124; &#96;1&#96;)</code> | `"a0"`, `"a1"`, `"b0"`, `"b1"` | `"0a"`, `"a"`, `""` |
+| <code>&#96;a&#96; (&#96;b&#96; &#124; &#96;c&#96;) &#96;d&#96;</code> | `"abd"`, `"acd"` | `"ab"`, `"ad"`, `""` |
+| <code>&#96;a&#96; &#124; &#96;b&#96; &#96;c&#96;</code> | `"a"`, `"bc"` | `"ac"`, `"b"`, `""` |
+| <code>(&#96;a&#96; &#124; &#96;b&#96;) &#96;c&#96;</code> | `"ac"`, `"bc"` | `"a"`, `"b"`, `""` |
+
+**Checkpoint.** What does concatenating a set A with `{ε}` do?
+
+Answer: it leaves A unchanged, because joining the empty string adds no characters.
+
+## Repetition: finite and unbounded counts
+
+A repetition operator, also called a quantifier, applies to the preceding literal, character range, or group. Counts are nonnegative whole numbers; a bounded range includes both endpoints and requires its lower bound to be no greater than its upper bound. Unbounded repetition still produces only finite strings.
+
+For a set A of strings, `A⁺` joins one or more choices from A. Each copy makes its own choice; it need not repeat the same selected member:
+
+```text
+A⁺ = A ∪ AA ∪ AAA ∪ …
+```
+
+| Pattern | Count | Accepted strings | Rejected strings |
 | --- | --- | --- | --- |
-| `a?` | Zero or one | `""`, `"a"` | `"aa"`, `"b"` |
-| `a*` | Zero or more | `""`, `"a"`, `"aaa"` | `"b"`, `"ab"` |
-| `a+` | One or more | `"a"`, `"aaa"` | `""`, `"b"` |
-| `a{2}` | Exactly two | `"aa"` | `"a"`, `"aaa"`, `""` |
-| `a{2,3}` | Two through three | `"aa"`, `"aaa"` | `"a"`, `"aaaa"`, `""` |
-| `a{2,}` | At least two | `"aa"`, `"aaaa"` | `"a"`, `""`, `"b"` |
-| `ab*` | One a, then zero or more b | `"a"`, `"ab"`, `"abbb"` | `""`, `"abab"` |
-| `(?:ab)*` | Zero or more copies of ab | `""`, `"ab"`, `"abab"` | `"a"`, `"aba"` |
+| <code>&#96;a&#96;?</code> | Zero or one | `""`, `"a"` | `"aa"`, `"b"` |
+| <code>&#96;a&#96;&#42;</code> | Zero or more | `""`, `"a"`, `"aaa"` | `"b"`, `"ab"` |
+| <code>&#96;a&#96;+</code> | One or more | `"a"`, `"aaa"` | `""`, `"b"` |
+| <code>&#96;a&#96;{0}</code> | Exactly zero | `""` | `"a"` |
+| <code>&#96;a&#96;{2}</code> | Exactly two | `"aa"` | `"a"`, `"aaa"` |
+| <code>&#96;a&#96;{2,3}</code> | Two or three | `"aa"`, `"aaa"` | `"a"`, `"aaaa"` |
+| <code>&#96;a&#96;{2,}</code> | At least two | `"aa"`, `"aaaa"` | `"a"`, `""` |
+| <code>&#96;a&#96; &#96;b&#96;&#42;</code> | One `a`, then zero or more `b`s | `"a"`, `"ab"`, `"abbb"` | `""`, `"abab"` |
+| <code>&#96;ab&#96;&#42;</code> | Zero or more copies of `ab` | `""`, `"ab"`, `"abab"` | `"a"`, `"aba"` |
+| <code>(&#96;a&#96; &#124; &#96;b&#96;){2}</code> | Two independent choices between `a` and `b` | `"aa"`, `"ab"`, `"ba"`, `"bb"` | `"a"`, `"abc"`, `""` |
 
-For an assertion-free pattern describing a string set A, we can interpret star as all finite concatenations of strings from A, including zero strings. This is our deduction from the repetition and concatenation rules. Zero repetitions produce ε, so `a*` accepts the empty string. This is not the [power set](set-operations.html#power-set), which contains subsets rather than joined strings.
+For a set A of strings, A* contains every finite concatenation of members of A, including zero copies. Zero copies produce ε. This is different from the power set, which contains subsets.
 
-**Checkpoint.** Why does `ab*` accept `"a"`, while `(?:ab)*` also accepts `""`?
+The entire backtick-delimited literal is one part. Thus <code>&#96;ab&#96;&#42;</code> and <code>(&#96;a&#96; &#96;b&#96;)&#42;</code> have the same meaning, unlike <code>&#96;a&#96; &#96;b&#96;&#42;</code>. Repeating <code>&#96;&#96;</code> any permitted number of times still produces only `""`; different construction choices do not create distinct values.
 
-Answer: in the first pattern, only `b` repeats. In the second, the entire group can occur zero times.
+**Checkpoint.** Does <code>&#96;ab&#96;&#42;</code> accept `"a"`? Does <code>&#96;a&#96; &#96;b&#96;&#42;</code>?
 
-## Shorthand and Unicode classes
+Answer: the first does not; the second does, by choosing zero copies of `b`.
 
-Rust's [shorthand classes](https://docs.rs/regex/1.12.2/regex/#perl-character-classes-unicode-friendly) include `\d` for a Unicode decimal digit, `\s` for Unicode whitespace, and `\w` for its Unicode word-character definition. In particular, `\w` is not limited to ASCII letters and includes digits and underscore. [Unicode properties](https://docs.rs/regex/1.12.2/regex/#unicode) provide more explicit categories such as `\p{Letter}`.
+## A complete example
 
-| Pattern | Accepted strings | Rejected strings |
-| --- | --- | --- |
-| `\d` | `"3"`, `"٣"` | `"a"`, `"33"`, `""` |
-| `\s` | `" "`, `"\t"`, `"\n"` | `"a"`, `"\t\t"`, `""` |
-| `\w` | `"a"`, `"é"`, `"3"`, `"_"` | `"-"`, `"ab"`, `""` |
-| `\p{Letter}` | `"a"`, `"é"`, `"β"` | `"3"`, `"_"`, `""` |
+Suppose a label contains one or more lowercase ASCII letters, a hyphen, and exactly two ASCII digits. In our proposed notation:
 
-Use `[0-9]` when the rule specifically requires ASCII digits. Do not silently replace it with `\d`.
-
-**Checkpoint.** Do `[0-9]` and `\d` describe the same choices here?
-
-Answer: no. The Unicode digit `٣` is accepted only by the latter.
-
-## Set operations inside character classes
-
-Rust supports union, intersection (`&&`), difference (`--`), and symmetric difference (`~~`) inside [character classes](https://docs.rs/regex/1.12.2/regex/#character-classes).
-
-| Pattern | Accepted strings | Rejected strings |
-| --- | --- | --- |
-| `[a-cx-z]` | `"a"`, `"c"`, `"x"`, `"z"` | `"d"`, `"ax"`, `""` |
-| `[[a-c]&&[b-d]]` | `"b"`, `"c"` | `"a"`, `"d"`, `"bc"`, `""` |
-| `[[a-d]--[bc]]` | `"a"`, `"d"` | `"b"`, `"c"`, `"ad"`, `""` |
-| `[[ab]~~[bc]]` | `"a"`, `"c"` | `"b"`, `"ac"`, `""` |
-| `[a&&b]` | None | `"a"`, `"b"`, `""` |
-
-These operate on sets of characters. They do not provide operators for intersecting or subtracting arbitrary multi-character regexes. For example, `[cat&&dog]` intersects the letters in the two classes; it does not compare the words `"cat"` and `"dog"`. This follows from the class grammar and its one-character matching rule.
-
-Nested brackets keep grouping visible. Class operators have their own precedence rules; do not assume they follow mathematical notation.
-
-**Checkpoint.** Can an empty character class match the empty string?
-
-Answer: no. Rust explicitly distinguishes [an empty class from an empty regex](https://docs.rs/regex/1.12.2/regex/#empty-matches).
-
-## Assertions and anchors
-
-An assertion checks a position without consuming a character. Rust's [empty-match syntax](https://docs.rs/regex/1.12.2/regex/#empty-matches) includes `\A` for the beginning of input, `\z` for its end, and `\b` for a word boundary.
-
-| Pattern | Accepted strings | Rejected strings |
-| --- | --- | --- |
-| `\Acat\z` | `"cat"` | `"cat\n"`, `"a cat"`, `""` |
-| `\bcat\b` | `"cat"` | `"cats"`, `"cat!"`, `""` |
-| Empty pattern | `""` | `"a"`, `"\n"` |
-
-These rows still use our whole-string wrapper. Without it, searching with `\bcat\b` also finds `"cat"` inside `"a cat!"`.
-
-`^` and `$` normally refer to the beginning and end of input, but [multi-line mode](https://docs.rs/regex/1.12.2/regex/#grouping-and-flags) makes them refer to line boundaries too. `\A` and `\z` keep their input-boundary meaning, which is why we use them for membership checks.
-
-**Checkpoint.** Does `\A` consume the first character?
-
-Answer: no. It checks the position before it.
-
-## Flags
-
-Flags change interpretation. Rust's [flag syntax](https://docs.rs/regex/1.12.2/regex/#grouping-and-flags) includes `i` for case-insensitive matching, `s` to let dot match newline, `m` for line anchors, and `x` for insignificant whitespace and comments. Unicode (`u`) is enabled by default.
-
-Scoped forms such as `(?i:cat)` change only the enclosed group.
-
-| Pattern | Accepted strings | Rejected strings |
-| --- | --- | --- |
-| `(?i:cat)` | `"cat"`, `"CAT"`, `"Cat"` | `"cats"`, `""` |
-| `(?s:.)` | `"a"`, `"\n"` | `""`, `"ab"` |
-| `(?x:a b)` | `"ab"` | `"a b"`, `""` |
-
-In verbose mode, whitespace is ignored even inside classes. An intended literal space must be represented explicitly, for example by `\x20`.
-
-**Checkpoint.** Does `(?x:a b)` require a space in the input?
-
-Answer: no. The space helps format the pattern; it is not matched.
-
-## Greedy and lazy matching
-
-Greedy repetition prefers more repetitions; lazy repetition, such as `+?`, prefers fewer. Rust documents both in its [repetition rules](https://docs.rs/regex/1.12.2/regex/#repetitions). Preference concerns which match a search returns, not just yes-or-no membership.
-
-This example deliberately uses **substring search**, unlike the tables:
-
-```rust
-use regex::Regex;
-
-fn main() {
-    let greedy = Regex::new(r"a+").unwrap();
-    let lazy = Regex::new(r"a+?").unwrap();
-    assert_eq!(greedy.find("aaa").unwrap().as_str(), "aaa");
-    assert_eq!(lazy.find("aaa").unwrap().as_str(), "a");
-}
+```text
+[`a`-`z`]+ `-` [`0`-`9`]{2}
 ```
 
-When used alone in our whole-string wrapper, both `a+` and `a+?` accept `"aaa"`: the end anchor requires consuming the entire input. This is a deduction from the preference and anchor rules, not a claim that every search API produces the same result.
+Read the parts in order: choose a letter at least once, require the literal hyphen, and choose a digit exactly twice. No variables or named fragments are needed.
 
-**Checkpoint.** Does lazy `a+?` mean "only one a is allowed"?
+In mathematical discussion, let A be the set of one-character strings from `"a"` through `"z"`, H be `{"-"}`, and D be the set of one-character ASCII digit strings. The language is:
 
-Answer: no. It changes preference, not the permitted repetition counts.
-
-## Capturing groups
-
-A capture records part of a match. `(ab)` captures by number, while `(?<name>ab)` gives it a name. `(?:ab)` only groups. See Rust's [group syntax](https://docs.rs/regex/1.12.2/regex/#grouping-and-flags).
-
-```rust
-use regex::Regex;
-
-fn main() {
-    let re = Regex::new(r"\A(?<letter>[ab])(?<digit>[0-9])\z").unwrap();
-    let captures = re.captures("a7").unwrap();
-    assert_eq!(&captures["letter"], "a");
-    assert_eq!(&captures["digit"], "7");
-    assert!(re.captures("a77").is_none());
-}
+```text
+A⁺ H D D
 ```
 
-For this example, capturing and non-capturing versions accept the same strings. Captures add extracted information, not a new membership condition. They do not enable backreferences, which the [crate overview](https://docs.rs/regex/1.12.2/regex/) says are unsupported. Look-around is also outside this engine's syntax.
+| Accepted strings | Rejected strings |
+| --- | --- |
+| `"a-00"`, `"cat-42"` | `"-42"`, `"Cat-42"`, `"cat-4"`, `"cat-042"`, `"cat-٣٤"`, `""` |
 
-**Checkpoint.** Does naming the digit group make it match the group name itself?
+The explicit digit range excludes non-ASCII digits. Whole-string acceptance rejects extra text before or after the label, including a trailing line feed. The [translation companion](regex-translations.html#a-label-in-existing-tools) shows external spellings of this rule without making them prerequisites.
 
-Answer: no. It still matches the enclosed `[0-9]` pattern.
+**Checkpoint.** Why does `"cat-042"` fail?
 
-## Putting the pieces together
+Answer: the rule requires exactly two digits after the hyphen.
 
-Consider a small label format: one or more lowercase ASCII letters, then a hyphen, then exactly two ASCII digits.
+## Beyond the first building blocks
 
-| Pattern | Accepted strings | Rejected strings |
-| --- | --- | --- |
-| `[a-z]+-[0-9]{2}` | `"a-00"`, `"cat-42"` | `"-42"`, `"Cat-42"`, `"cat-4"`, `"cat-042"`, `"cat-٣٤"`, `""` |
+We have used singleton sets, joining, union, and finite repetition. Earlier [set operations](set-operations.html) also included intersection, difference, complement, and symmetric difference. Knowing those mathematical operations does not yet give them language syntax.
 
-The letter class chooses each letter, `+` repeats it, concatenation places the literal hyphen next, and `{2}` requires two digits. The whole-string wrapper excludes extra text. This is a deduction from the class, concatenation, and repetition rules above.
+For instance, intersecting `{"a", "b", "c"}` with `{"b", "c", "d"}` gives `{"b", "c"}` by the [intersection definition](set-operations.html#intersection). Whether to give that operation notation for whole string sets or a restricted one-character case remains an [open design question](open-design-questions.html#what-notation-expresses-the-operations). Neither bracketed choice shorthand nor set operations inside brackets are required by these lessons; their possible designs remain separate questions. Variables and type relationships can wait until the small pattern vocabulary is clear.
 
-This checks a textual format. It does not turn a string into a number or define a type in our proposed language.
+**Checkpoint.** Have we given every set operation a pattern operator?
 
-**Checkpoint.** Why reject `"cat-٣٤"` even though its ending contains two digits?
+Answer: no. A mathematical operation and a proposed language feature are different things.
 
-Answer: our rule specifies ASCII digits, and `[0-9]` expresses that restriction.
-
-Next: [Pomsky and regex syntax comparisons](pomsky-comparison.html).
+Next: [cardinality and mappings](cardinality-and-mappings.html), including why <code>&#96;a&#96;+</code> and <code>&#96;a&#96;+ &#96;b&#96;+</code> both describe countably infinite sets.

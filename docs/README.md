@@ -1,24 +1,26 @@
 # Regex as types
 
-Can a regex describe a set of allowed values? Start with sets, then learn how Rust regex patterns describe sets of strings. Later, we can use these foundations to explore type constraints.
+Can a pattern describe a set of allowed values? Start with sets and strings, then develop our own small pattern language. A literal value is the simplest pattern; operations on its parts let us describe more values. Later, we can use these foundations to explore type constraints.
 
-This is a first teaching draft, not a language specification. Each concept has its own section, examples, and a checkpoint so we can review the order and explanations separately.
+This is a teaching draft with proposed notation, not an implemented language. Whole-string acceptance is fixed: every pattern must accept the input from beginning to end. The exact notation is open for review. Each concept has examples and a checkpoint.
 
 ## Reading path
 
 1. [Set foundations](sets.html): membership, equality, subsets, the empty set, and describing a set with a rule.
 2. [Set operations](set-operations.html): union, intersection, difference, complement, symmetric difference, products, and power sets.
 3. [Strings and regexes](regex-introduction.html): strings as values, sets of strings, and whole-string matching versus search.
-4. [Rust regex building blocks](regex-building-blocks.html): literals, character classes, combinations, repetition, assertions, and flags.
-5. [Pomsky and regex syntax comparisons](pomsky-comparison.html): tabbed examples in Pomsky, Rust regex, and our set notation, plus syntax ideas to discuss.
-6. [Review this draft](review.html): a lesson checklist, verification scope, and questions for the next pass.
+4. [Our first pattern language](pattern-language.html): backtick-delimited literals, a small proposed vocabulary, and fully consuming acceptance without anchors.
+5. [Building patterns from sets](regex-building-blocks.html): use our notation for literals, alternatives, character ranges, empty strings, joining, and repetition.
+6. [Cardinality and mappings](cardinality-and-mappings.html): distinct members, functions and bijections, countable infinity, and why <code>&#96;a&#96;+</code> and <code>&#96;a&#96;+ &#96;b&#96;+</code> have equal cardinality but different counts by length.
+7. [Open design questions](open-design-questions.html): fixed direction, proposed notation, and unresolved decisions about values, operations, and types.
+8. [Review this draft](review.html): a lesson checklist, verification scope, and questions for the next pass.
+
+Optional: [supplemental regex translations](regex-translations.html) show how selected patterns can be expressed using existing tools. They are not prerequisites for the main path.
 
 ## Scope of this draft
 
-The set lessons start with small finite sets. The regex lessons use Rust's `regex` crate 1.12.2, with Unicode enabled and other flags at their defaults unless stated. We use UTF-8 strings, not byte regexes. Most examples check the entire string, not whether a matching substring exists.
+The set lessons start with small finite sets. String examples use finite sequences of Unicode scalar values as an explicit teaching universe; the proposed language's final character model, encoding, and type rules remain [open design questions](open-design-questions.html). The first draft concerns string constraints, without variables or named fragments.
 
-Rust is our reference format for now. Its [crate documentation](https://docs.rs/regex/1.12.2/regex/) describes the supported syntax and notes that look-around and backreferences are not supported. We also compare Pomsky 0.12.0 targeting Rust. Pomsky is a [regex language and compiler](https://github.com/pomsky-lang/pomsky/blob/v0.12.0/README.md#compatibility-and-portability), not another matching engine. JavaScript, Python, Ruby, and Perl remain candidates for later engine comparisons.
-
-These assumptions organize the lessons. They do not settle the proposed language's value universe, encoding, syntax, or type rules.
+The core examples use our proposed language. Pomsky supplies inspiration for readable literal-and-operation notation; Rust and Pomsky appear in the optional translation companion. Neither defines our rules, and no implementation target has been chosen. Checks of external translations are separate from the proposed language, which has no executable implementation here.
 
 Start with [set foundations](sets.html).
