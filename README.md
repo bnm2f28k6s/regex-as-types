@@ -8,6 +8,8 @@ The language is not tied to an existing regex syntax or engine. Pomsky inspires 
 
 The website's pages live in `docs/`. Start with `docs/README.md`. The teaching path follows set foundations, set operations, strings, our first pattern language, building patterns, then cardinality and mappings. Main examples use our proposed notation; engine translations are supplemental. Variables and named fragments are deferred. `docs/open-design-questions.md` separates fixed direction from unresolved decisions. `docs/review.md` records the review scope and questions; `docs/examples.md` is initializer sample content, not a language specification.
 
+The lessons prefer backticks for pattern literals and double quotes for example string values, with no interpolation in the first draft. Explicit alternatives are the preferred choice notation. Bracketed choice shorthand remains an open option rather than a prohibited feature; core examples use brackets for character ranges.
+
 Contributions should explain ideas in plain language, build on earlier lessons, and link to sources for technical claims. Record unresolved language-design choices on the [open design questions page](docs/open-design-questions.md). Agents should read [AGENTS.md](AGENTS.md) before working on the project.
 
 Starting references:

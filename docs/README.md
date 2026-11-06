@@ -9,9 +9,9 @@ This is a teaching draft with proposed notation, not an implemented language. Wh
 1. [Set foundations](sets.html): membership, equality, subsets, the empty set, and describing a set with a rule.
 2. [Set operations](set-operations.html): union, intersection, difference, complement, symmetric difference, products, and power sets.
 3. [Strings and regexes](regex-introduction.html): strings as values, sets of strings, and whole-string matching versus search.
-4. [Our first pattern language](pattern-language.html): quoted literals, a small proposed vocabulary, and fully consuming acceptance without anchors.
+4. [Our first pattern language](pattern-language.html): backtick-delimited literals, a small proposed vocabulary, and fully consuming acceptance without anchors.
 5. [Building patterns from sets](regex-building-blocks.html): use our notation for literals, alternatives, character ranges, empty strings, joining, and repetition.
-6. [Cardinality and mappings](cardinality-and-mappings.html): distinct members, functions and bijections, countable infinity, and why `"a"+` and `"a"+ "b"+` have equal cardinality but different counts by length.
+6. [Cardinality and mappings](cardinality-and-mappings.html): distinct members, functions and bijections, countable infinity, and why <code>&#96;a&#96;+</code> and <code>&#96;a&#96;+ &#96;b&#96;+</code> have equal cardinality but different counts by length.
 7. [Open design questions](open-design-questions.html): fixed direction, proposed notation, and unresolved decisions about values, operations, and types.
 8. [Review this draft](review.html): a lesson checklist, verification scope, and questions for the next pass.
 

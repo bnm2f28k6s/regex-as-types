@@ -24,7 +24,7 @@ For the first preview, check these behaviors:
 - The sidebar follows the reading order rather than sorting pages alphabetically.
 - Every concept appears as a separate heading and can be reached by a heading link.
 - Set formulas are typeset, not shown as raw TeX.
-- Proposed notation remains plain text, Rust examples have readable highlighting in the companion, and table patterns retain quotes, backslashes, and vertical bars.
+- Proposed notation remains plain text, Rust examples have readable highlighting in the companion, and table patterns retain backtick delimiters, backslashes, and vertical bars. Double-quoted input values must remain distinct from patterns, including the empty value `""` and its two-backtick literal pattern.
 - Previous concepts and next-page links point to the intended pages.
 - Site search can find a concept such as "symmetric difference."
 - The main pattern lessons use our notation without requiring engine tabs. Check the set formulas and accepted/rejected tables alongside it.
@@ -50,10 +50,11 @@ For Pomsky translations, use Pomsky **0.12.0** with `--flavor rust`. Test compil
 ## Questions for the next review
 
 - Do set foundations and set operations need more worked examples, or do the checkpoints suffice?
-- Can a reader explain `"cat"`, `"a+b"`, and whole-string acceptance without knowing regex syntax?
-- Is it clear that `|` expresses choices of any length, while square brackets delimit only a character range?
+- Can a reader distinguish the pattern <code>&#96;cat&#96;</code> from the value `"cat"`, and explain <code>&#96;a+b&#96;</code> and whole-string acceptance without knowing regex syntax?
+- Is it clear that `|` is preferred for choices and brackets illustrate ranges, without ruling out optional bracketed shorthand later?
+- Does <code>&#96;${name}&#96;</code> clearly mean literal text rather than JavaScript-style interpolation?
 - Does grouping make repeated or joined alternatives clear, and are symbolic repetition counts readable?
-- Is the difference between `"ab"*` and `"a" "b"*` clear?
+- Is the difference between <code>&#96;ab&#96;&#42;</code> and <code>&#96;a&#96; &#96;b&#96;&#42;</code> clear?
 - Can readers complete the main path without opening the supplemental translations?
 - Is the building-pattern sequence comfortable to read, or should sections become separate pages?
 - Which concepts need diagrams or exercises before moving into type constraints?

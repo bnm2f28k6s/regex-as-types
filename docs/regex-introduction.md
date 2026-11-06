@@ -26,7 +26,7 @@ L(p) = \{s \in U \mid s \text{ matches } p \text{ as a whole string}\}
 
 This is the [set-builder idea](sets.html#describing-a-set-with-a-rule) applied to strings. A pattern is the description; `L(p)` is the set it describes. The letter p is a placeholder in our mathematical discussion, not variable notation in the proposed language.
 
-For example, a pattern that means "exactly the text cat" describes `{"cat"}`. The strings `"cats"`, `"a cat"`, and `""` are outside this set. The [next lesson](pattern-language.html) proposes writing that pattern as `"cat"`: a literal value used as a description of the set containing it.
+For example, a pattern that means "exactly the text cat" describes `{"cat"}`. The strings `"cats"`, `"a cat"`, and `""` are outside this set. The [next lesson](pattern-language.html) writes that pattern as <code>&#96;cat&#96;</code>: a literal value used as a description of the set containing it. Backticks mark pattern notation; double quotes continue to mark example string values.
 
 **Checkpoint.** Can a small pattern describe an infinite set?
 

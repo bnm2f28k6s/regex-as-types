@@ -1,6 +1,6 @@
 # Cardinality and mappings
 
-The patterns `"a"+` and `"a"+ "b"+` both describe countably infinite sets. Yet the second has two independently chosen repetition counts, where the first has only one. How can they have the same size?
+The patterns <code>&#96;a&#96;+</code> and <code>&#96;a&#96;+ &#96;b&#96;+</code> both describe countably infinite sets. Yet the second has two independently chosen repetition counts, where the first has only one. How can they have the same size?
 
 This lesson separates the number of distinct values from the structure of those values. Read [building patterns from sets](regex-building-blocks.html) first. We use our proposed notation, whole-string acceptance, and finite Unicode scalar-value strings as the teaching universe. Infinite sets here allow arbitrarily long finite strings; they do not assume a particular machine's storage limit. No engine syntax is required.
 
@@ -15,9 +15,9 @@ For example:
 - `|∅| = 0`.
 - `|{""}| = 1`. An empty string is still one value.
 - `|{"a", "aa", "aaa"}| = 3`, even though the strings have different lengths.
-- `|L("a"{1,3})| = 3` under whole-string acceptance.
+- <code>&#124;L(&#96;a&#96;{1,3})&#124; = 3</code> under whole-string acceptance.
 
-Different descriptions can name the same member. `"a" | "a"` still describes just `{"a"}`. Counting alternatives, repetition choices, or ways to match is not necessarily counting distinct strings.
+Different descriptions can name the same member. <code>&#96;a&#96; &#124; &#96;a&#96;</code> still describes just `{"a"}`. Counting alternatives, repetition choices, or ways to match is not necessarily counting distinct strings.
 
 **Checkpoint.** How many members does `{"ab", "ab", "ba"}` have?
 
@@ -65,7 +65,7 @@ Write `N+ = {1, 2, 3, ...}` for the positive integers. A set is **countably infi
 
 The practical test is whether the members can be arranged in an endless list with every member at a finite position, appearing exactly once. You never finish the list, but no particular member waits until "after infinity."
 
-For `A = L("a"+)`, use the mapping `n → aⁿ`, where `aⁿ` means the string with n copies of `a`. This is mathematical repetition notation, not additional pattern-language syntax.
+For <code>A = L(&#96;a&#96;+)</code>, use the mapping `n → aⁿ`, where `aⁿ` means the string with n copies of `a`. This is mathematical repetition notation, not additional pattern-language syntax.
 
 | Position n | Member of A |
 | --- | --- |
@@ -76,13 +76,13 @@ For `A = L("a"+)`, use the mapping `n → aⁿ`, where `aⁿ` means the string w
 
 Every positive length gives a different string, and every string in A has one such length. The mapping is therefore a bijection, so A is countably infinite. No member is itself infinitely long.
 
-**Checkpoint.** Does adding the empty string make `L("a"*)` a larger cardinality?
+**Checkpoint.** Does adding the empty string make <code>L(&#96;a&#96;&#42;)</code> a larger cardinality?
 
-Answer: no. List `""`, `"a"`, `"aa"`, and so on. It is still countably infinite, even though `L("a"+)` is a proper subset of it.
+Answer: no. List `""`, `"a"`, `"aa"`, and so on. It is still countably infinite, even though <code>L(&#96;a&#96;+)</code> is a proper subset of it.
 
 ## Why two repetition counts are still countable
 
-Let `B = L("a"+ "b"+)`. Its members have the form `aⁱbʲ`, where i and j are independently chosen positive integers. For instance, `"aabbb"` corresponds to `(2, 3)`. `"a"`, `"b"`, `"ba"`, and `""` are excluded.
+Let <code>B = L(&#96;a&#96;+ &#96;b&#96;+)</code>. Its members have the form `aⁱbʲ`, where i and j are independently chosen positive integers. For instance, `"aabbb"` corresponds to `(2, 3)`. `"a"`, `"b"`, `"ba"`, and `""` are excluded.
 
 The mapping `(i, j) → aⁱbʲ` is a bijection from `N+ × N+` to B: the transition from `a` to `b` lets us recover both counts uniquely. B contains strings, not pairs, but the pairs give us a way to index them.
 
@@ -122,7 +122,7 @@ Cardinality ignores length and the internal organization of members. We can reta
 
 For positive n, our patterns give these counts:
 
-| Exact length n | `"a"+` | `"a"+ "b"+` | <code>(&quot;a&quot; &#124; &quot;b&quot;)+</code> |
+| Exact length n | <code>&#96;a&#96;+</code> | <code>&#96;a&#96;+ &#96;b&#96;+</code> | <code>(&#96;a&#96; &#124; &#96;b&#96;)+</code> |
 | --- | --- | --- | --- |
 | 1 | 1 | 0 | 2 |
 | 2 | 1 | 1 | 4 |
@@ -132,15 +132,15 @@ For positive n, our patterns give these counts:
 
 These are deductions from our proposed [alternatives](regex-building-blocks.html#alternatives-add-members) and [repetition rules](regex-building-blocks.html#repetition-finite-and-unbounded-counts):
 
-- `"a"+` has one string at each positive length.
-- `"a"+ "b"+` has `n − 1` strings of length n: choose the split after one of the first `n − 1` characters.
-- `("a" | "b")+` has `2ⁿ` strings of length n: choose `a` or `b` independently at each position.
+- <code>&#96;a&#96;+</code> has one string at each positive length.
+- <code>&#96;a&#96;+ &#96;b&#96;+</code> has `n − 1` strings of length n: choose the split after one of the first `n − 1` characters.
+- <code>(&#96;a&#96; &#124; &#96;b&#96;)+</code> has `2ⁿ` strings of length n: choose `a` or `b` independently at each position.
 
 All three languages are countably infinite, but their counts at each length differ. Up to length N, the first has N members and the second has `N(N − 1)/2`. The latter follows by summing the counts `0 + 1 + ... + (N − 1)`. A length bound makes the difference finite and directly comparable.
 
-There is another warning about counting choices. For `"a"+ "a"+`, pairs `(1, 2)` and `(2, 1)` both concatenate to `"aaa"`. This pattern's two repetition counts do not uniquely identify distinct output strings. Its language is just `L("a"{2,})`, with one string at each length of at least two. The map from pairs to strings is surjective onto that language but not injective.
+There is another warning about counting choices. For <code>&#96;a&#96;+ &#96;a&#96;+</code>, pairs `(1, 2)` and `(2, 1)` both concatenate to `"aaa"`. This pattern's two repetition counts do not uniquely identify distinct output strings. Its language is just <code>L(&#96;a&#96;{2,})</code>, with one string at each length of at least two. The map from pairs to strings is surjective onto that language but not injective.
 
-**Checkpoint.** How many distinct strings of length 4 match `"a"+ "a"+`? How many match `"a"+ "b"+`?
+**Checkpoint.** How many distinct strings of length 4 match <code>&#96;a&#96;+ &#96;a&#96;+</code>? How many match <code>&#96;a&#96;+ &#96;b&#96;+</code>?
 
 Answer: one (`"aaaa"`) versus three (`"abbb"`, `"aabb"`, `"aaab"`). Ways to split a match are not additional members.
 
