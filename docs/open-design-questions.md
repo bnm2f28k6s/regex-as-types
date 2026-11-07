@@ -82,10 +82,10 @@ The [cardinality lesson](cardinality-and-mappings.html) shows that <code>L(&#96;
 
 Their supplemental role is settled. Remaining questions are about which comparisons are useful, not which system defines the language:
 
-1. Which additional translations would answer a concrete design question?
+1. Which additional examples would help readers recognize our notation in a familiar programming language or regex engine?
 2. Which examples can be translated faithfully, and what assumptions must each adapter preserve?
 3. Which engine-specific features, if any, are worth discussing later rather than leaving outside the teaching path?
 
-The optional companion uses Rust regex 1.12.2 and Pomsky 0.12.0 targeting Rust. These versions bound external checks only. They do not choose our syntax, character model, or implementation.
+The optional companion includes Rust regex 1.12.2 and Pomsky 0.12.0 targeting Rust, alongside JavaScript, Python, Java, .NET (C#), and PCRE2 illustrations. Its [adapters and verification notes](regex-translations.html#preserving-whole-string-acceptance) state the assumptions and distinguish locally tested examples from documentation-backed illustrations. These comparisons do not choose our syntax, character model, or implementation, and need not catalog each engine's extensions.
 
 Return to the [reading path](/#reading-path) or [review this draft](review.html).
