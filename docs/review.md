@@ -30,7 +30,8 @@ For the first preview, check these behaviors:
 - Site search can find a concept such as "symmetric difference."
 - The main pattern lessons use our notation without requiring engine tabs. Check the set formulas and accepted/rejected tables alongside it.
 - The new type lesson follows cardinality in both the sidebar and next-page links. Its membership and inclusion tables preserve `∈`, `⊆`, `<:`, literal backticks, and the distinction between ∅ and `{""}`.
-- On the supplemental page, switch the label example between our proposal, Pomsky, and Rust regex. The proposed form should be the initial panel.
+- On the supplemental page, switch the single label comparison group through our proposal, Pomsky, Rust regex, JavaScript, Python, Java, .NET (C#), and PCRE2. Our proposal should be selected initially. Check that exactly one panel is visible, the tab labels wrap within their container at narrow widths, and external snippets preserve literal quotes, backslashes, and host-language delimiters. The companion's page-local CSS enables wrapping without changing tabs elsewhere.
+- Check the supplemental adapter list at narrow and desktop widths, including browser zoom. Its text and inline code should wrap within the reading column without overlapping the right-hand navigation. Long call chains belong in prose steps or locally scrollable code blocks, not table cells that force the whole table wider.
 - Open the design-question links from the lessons and verify they reach the relevant question.
 
 The initializer's [Markdown feature sample](examples.html) remains available for reference but is not part of the lesson navigation or an authority on generator behavior. Use [Docgen 0.3.3's upstream documentation](https://github.com/thecodrr/docgen/tree/0.3.3/docs) when checking features.
@@ -41,7 +42,7 @@ Run `just check` and `git diff --check` from the project root to check the regre
 
 Our proposed notation has no executable implementation. Review its examples against the stated set-building rules. Separately check hand-authored translations with Rust `regex` **1.12.2**, default crate features and flags, and the `\A(?:pattern)\z` wrapper. Test the accepted/rejected tables, empty strings, trailing line feeds, literal operator characters, grouping, and repetition of entire literals. Passing translations is not proof of a compiler or execution of our language. Keep any test crate outside the repository.
 
-Run the complete Rust snippet in the supplemental companion unchanged. Its search call intentionally differs from the anchored membership calls.
+Run the complete Rust snippet in the supplemental companion unchanged. Its search call intentionally differs from the anchored membership calls. The later label snippets are usage fragments, not standalone programs. Check the shared translation table with each available engine's stated whole-string adapter, including the label's accepted and rejected inputs. Use the companion's [verification notes](regex-translations.html#what-was-checked) to distinguish executed checks from documentation-backed Java and .NET illustrations; do not report an unavailable engine as tested. These are small translation examples, not a comprehensive compatibility or extension suite.
 
 For the set examples, calculate results with the finite universes shown on each page, including empty-set boundary cases. These finite checks illustrate the definitions. They are not proofs about every possible set.
 
